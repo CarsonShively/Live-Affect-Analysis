@@ -41,6 +41,7 @@ def process_images():
     train = []
     val = []
     test = []
+    labels = []
 
     counter = 0
     for image_path in local_images_path.iterdir():
