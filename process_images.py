@@ -11,11 +11,12 @@ def process_images():
     
     local_images_path = Path("/content/Data")
     
-    shutil.copytree(
-        images_path,
-        local_images_path,
-        dirs_exist_ok=True
-    )
+    if not local_images_path.is_dir():
+        shutil.copytree(
+            images_path,
+            local_images_path,
+            dirs_exist_ok=True
+        )
     
     df = pd.read_csv(labels_path)
     
@@ -85,6 +86,15 @@ def process_images():
     del val
     test_numpy = np.stack(test)
     del test 
+    
+    local_out_path = Path(__file__).resolve().parents[0] / "processed_images"
+    if local_images_path.is_dir():
+        shutil.rmtree(local_out_path)
+    local_out_path.mkdir(parents=True, exist_ok=True)
+        
+    np.save(local_out_path / "train.npy", train_numpy)  
+    np.save(local_out_path / "val.npy", val_numpy)  
+    np.save(local_out_path / "test.npy", test_numpy) 
     
     np.save(out_path / "train.npy", train_numpy)  
     np.save(out_path / "val.npy", val_numpy)  
