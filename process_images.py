@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import shutil
 
+
 def process_images():
     images_path = Path("/content/drive/MyDrive/Live-Affect-Analysis/Data")
     labels_path = Path("/content/drive/MyDrive/Live-Affect-Analysis/Labels/HECO_Labels.csv")
@@ -35,16 +36,8 @@ def process_images():
         shutil.rmtree(out_path)
     out_path.mkdir(parents=True, exist_ok=True)
 
-    train_index = int(images_count * 0.70)
-    val_index = int(images_count * 0.80)
-
-    train = []
-    val = []
-    test = []
-    labels = []
-
-    counter = 0
     for image_path in local_images_path.iterdir():
+        name = image_path.stem
         try:
             if not image_path.is_file():
                 continue
@@ -68,38 +61,15 @@ def process_images():
             
             image_numpy = image_tensor_normalized.numpy()
             
-            if counter < train_index:
-                train.append(image_numpy)
-            elif counter < val_index:
-                val.append(image_numpy)
-            else:
-                test.append(image_numpy)
-            counter += 1
+            np.save(out_path / f"{name}.npy", image_numpy)
+
             images_count -= 1
             print(f"{images_count} images remaining")
         except Exception as error:
             print(f"Error file: {image_path.name}: {error}")
             continue
         
-    train_numpy = np.stack(train)
-    del train
-    val_numpy = np.stack(val)
-    del val
-    test_numpy = np.stack(test)
-    del test 
-    
-    local_out_path = Path(__file__).resolve().parents[0] / "processed_images"
-    if local_images_path.is_dir():
-        shutil.rmtree(local_out_path)
-    local_out_path.mkdir(parents=True, exist_ok=True)
-        
-    np.save(local_out_path / "train.npy", train_numpy)  
-    np.save(local_out_path / "val.npy", val_numpy)  
-    np.save(local_out_path / "test.npy", test_numpy) 
-    
-    np.save(out_path / "train.npy", train_numpy)  
-    np.save(out_path / "val.npy", val_numpy)  
-    np.save(out_path / "test.npy", test_numpy)  
+
         
 if __name__ == "__main__":
     process_images()
