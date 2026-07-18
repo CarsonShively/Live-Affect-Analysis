@@ -14,8 +14,8 @@ def train_model():
     del train_images
     
     val_images = np.load(train_path / "val_images.npy")
-    val_images_tensor = tf.convert_to_tensor(val_images, dtype=tf.uint8)
     val_images = val_images[:64]
+    val_images_tensor = tf.convert_to_tensor(val_images, dtype=tf.uint8)
     del val_images
     
     train_labels = np.load(train_path / "train_labels.npy")
