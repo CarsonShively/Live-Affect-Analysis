@@ -11,6 +11,8 @@ def build_matrices():
     
     df = pd.read_csv(labels)
     
+    print("loaded")
+    
     if not local_images_path.is_dir():
         shutil.copytree(
             images_path,
@@ -57,6 +59,7 @@ def build_matrices():
     test_labels = []
     
     total_samples = train_size + val_size + test_size
+    samples_remaining = total_samples
     
     samples_counter = 0
     train_counter = 0
@@ -95,6 +98,8 @@ def build_matrices():
             
             
         samples_counter += 1
+        samples_remaining -= 1
+        print(f"samples remaining: {samples_remaining}")
         
     train_images.flush()
     val_images.flush()
@@ -103,7 +108,9 @@ def build_matrices():
     train_labels_matrix = np.stack(train_labels)
     val_labels_matrix = np.stack(val_labels)
     test_labels_matrix = np.stack(test_labels)
-        
+    
+    print("copying to drive")
+    
     drive_modeling_out = Path("/content/drive/MyDrive/Live-Affect-Analysis/modeling_matrices")
     drive_eval_out = Path("/content/drive/MyDrive/Live-Affect-Analysis/eval_matrices")
     
@@ -135,6 +142,8 @@ def build_matrices():
     )
     
     np.save(drive_eval_out / "test_labels.npy", test_labels_matrix)
+    
+    print("complete")
     
 if __name__ == "__main__":
     build_matrices()
