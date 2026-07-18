@@ -4,9 +4,9 @@ class BaselineCNN(tf.keras.Model):
     def __init__(self):
         
         self.fliters1 = 32
-        self.fliters1 = 64
-        self.fliters1 = 128
-        self.fliters1 = 256
+        self.fliters2 = 64
+        self.fliters3 = 128
+        self.fliters4 = 256
         
         self.rescale = tf.keras.layers.Rescaling(1 / 255.0)
         
@@ -18,7 +18,7 @@ class BaselineCNN(tf.keras.Model):
         self.pool = tf.keras.layers.GlobalAveragePooling2D()
         
         self.hidden1 = tf.keras.layers.Dense(256, activation="relu")
-        self.hidden1 = tf.keras.layers.Dense(128, activation="relu")
+        self.hidden2 = tf.keras.layers.Dense(128, activation="relu")
         
         self.category_hidden = tf.keras.layers.Dense(64, activation="relu")
         self.satisfaction_hidden = tf.keras.layers.Dense(64, activation="relu")
