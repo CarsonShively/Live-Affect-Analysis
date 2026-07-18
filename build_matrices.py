@@ -29,6 +29,10 @@ def build_matrices():
     val_size = int(count * 0.10)
     test_size = count - val_size - train_size
     
+    print(f"train size: {train_size}")
+    print(f"val size: {val_size}")
+    print(f"test size: {test_size}")
+    
     local_out = Path("/content/image_matrices")
     if local_out.is_dir():
         shutil.rmtree(local_out)
