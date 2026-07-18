@@ -44,7 +44,7 @@ def train_model():
     
     model = AffectAnalysisCNN()
     
-    optimizer = tf.keras.optimizers.AdamW(learning_rate=3e-4, weight_decay=1e-4)
+    optimizer = tf.keras.optimizers.AdamW(learning_rate=3e-4, weight_decay=1e-5)
     
     losses = {
         "category": tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -72,17 +72,24 @@ def train_model():
      
     early_stopping = tf.keras.callbacks.EarlyStopping(
         monitor="val_loss",
-        patience=10,
+        patience=7,
         restore_best_weights=True
+    )
+    
+    lr_plateu = tf.keras.callbacks.ReduceLROnPlateau(
+        monitor="val_loss",
+        patience=3,
+        factor=0.5,
+        min_lr=1e-6
     )
     
     model.fit(
         train_images_tensor,
         train_labels_tensors,
         validation_data=(val_images_tensor, val_labels_tensors),
-        batch_size=32,
-        epochs=100,
-        callbacks=[early_stopping]
+        batch_size=8,
+        epochs=30,
+        callbacks=[early_stopping, lr_plateu]
     )
     
     model_out = Path("/content/model")
