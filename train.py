@@ -48,7 +48,7 @@ def train_model():
     
     model = BaselineCNN()
     
-    optimizer = tf.keras.optimizers.AdamW(learning_rate=3e-4)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=3e-4)
     
     losses = {
         "category": tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
