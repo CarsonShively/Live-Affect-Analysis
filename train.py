@@ -85,8 +85,8 @@ def train_model():
         train_labels_tensors,
         validation_data=(val_images_tensor, val_labels_tensors),
         batch_size=32,
-        epochs=100,
-        callbacks=[early_stopping]
+        epochs=100
+        #callbacks=[early_stopping]
     )
     
     model_out = Path("/content/model")
