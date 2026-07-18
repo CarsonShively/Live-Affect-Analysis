@@ -84,7 +84,7 @@ def train_model():
         train_images_tensor,
         train_labels_tensors,
         validation_data=(val_images_tensor, val_labels_tensors),
-        batch_size=32,
+        batch_size=4,
         epochs=100
         #callbacks=[early_stopping]
     )
