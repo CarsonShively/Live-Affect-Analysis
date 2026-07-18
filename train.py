@@ -47,27 +47,27 @@ def train_model():
     optimizer = tf.keras.optimizers.AdamW(learning_rate=3e-4)
     
     losses = {
-        "category": tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-        "satisfaction": tf.keras.losses.MeanSquaredError(),
-        "calmness": tf.keras.losses.MeanSquaredError(),
-        "valence": tf.keras.losses.MeanSquaredError(),
-        "arousal": tf.keras.losses.MeanSquaredError(),
-        "dominance": tf.keras.losses.MeanSquaredError()
+        "category": tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        #"satisfaction": tf.keras.losses.MeanSquaredError(),
+        #"calmness": tf.keras.losses.MeanSquaredError(),
+        #"valence": tf.keras.losses.MeanSquaredError(),
+        #"arousal": tf.keras.losses.MeanSquaredError(),
+        #"dominance": tf.keras.losses.MeanSquaredError()
     }
     
-    loss_weights = {
+    """loss_weights = {
         "category": 1,
         "satisfaction": 1,
         "calmness": 1,
         "valence": 1,
         "arousal": 1,
         "dominance": 1
-    }
+    }"""
     
     model.compile(
         optimizer=optimizer,
-        loss=losses,
-        loss_weights=loss_weights
+        loss=losses
+        #loss_weights=loss_weights
     )
      
     early_stopping = tf.keras.callbacks.EarlyStopping(
