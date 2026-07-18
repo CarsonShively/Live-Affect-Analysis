@@ -9,15 +9,19 @@ def train_model():
     train_path = Path("/content/drive/MyDrive/Live-Affect-Analysis/modeling_matrices")
     
     train_images = np.load(train_path / "train_images.npy")
+    train_images = train_images[:64]
     train_images_tensor = tf.convert_to_tensor(train_images, dtype=tf.uint8)
     del train_images
     
     val_images = np.load(train_path / "val_images.npy")
     val_images_tensor = tf.convert_to_tensor(val_images, dtype=tf.uint8)
+    val_images = val_images[:64]
     del val_images
     
     train_labels = np.load(train_path / "train_labels.npy")
+    train_labels = train_labels[:64]
     val_labels = np.load(train_path / "val_labels.npy")
+    val_labels = val_labels[:64]
     
     train_labels_tensors = {
         "category": tf.convert_to_tensor(train_labels[:, 0], dtype=tf.int32),
