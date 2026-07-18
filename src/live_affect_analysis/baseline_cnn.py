@@ -2,6 +2,7 @@ import tensorflow as tf
 
 class BaselineCNN(tf.keras.Model):
     def __init__(self):
+        super().__init__()
         
         self.fliters1 = 32
         self.fliters2 = 64
@@ -10,10 +11,10 @@ class BaselineCNN(tf.keras.Model):
         
         self.rescale = tf.keras.layers.Rescaling(1 / 255.0)
         
-        self.conv1 = tf.keras.layers.Conv2D(filters=self.fliters1, kernel_size=(5, 5), activation="relu")
-        self.conv2 = tf.keras.layers.Conv2D(filters=self.fliters2, kernel_size=(5, 5), activation="relu")
-        self.conv3 = tf.keras.layers.Conv2D(filters=self.fliters3, kernel_size=(5, 5), activation="relu")
-        self.conv4 = tf.keras.layers.Conv2D(filters=self.fliters4, kernel_size=(5, 5), activation="relu")
+        self.conv1 = tf.keras.layers.Conv2D(filters=self.fliters1, kernel_size=(5, 5), strides=2, padding="same", activation="relu")
+        self.conv2 = tf.keras.layers.Conv2D(filters=self.fliters2, kernel_size=(5, 5), strides=2, padding="same", activation="relu")
+        self.conv3 = tf.keras.layers.Conv2D(filters=self.fliters3, kernel_size=(5, 5), strides=2, padding="same", activation="relu")
+        self.conv4 = tf.keras.layers.Conv2D(filters=self.fliters4, kernel_size=(5, 5), strides=2, padding="same", activation="relu")
         
         self.pool = tf.keras.layers.GlobalAveragePooling2D()
         
@@ -46,7 +47,6 @@ class BaselineCNN(tf.keras.Model):
         
         x = self.hidden1(x)
         x = self.hidden2(x)
-        x = self.hidden3(x)
         
         cat_hidden = self.category_hidden(x)
         sat_hidden = self.satisfaction_hidden(x)
