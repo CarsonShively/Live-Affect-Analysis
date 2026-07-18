@@ -80,7 +80,7 @@ def build_matrices():
         
         labels = []
         
-        label_df = df[df["Image"] == name]
+        label_df = df[df["Image"] == image_id]
         labels.append(category_map[label_df["Category"].iloc[0]])
         labels.append(satisfaction_map[label_df["Label_SA"].iloc[0]])
         labels.append(calmness_map[label_df["Label_CA"].iloc[0]])
