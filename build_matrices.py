@@ -59,7 +59,10 @@ def build_matrices():
     test_labels = []
     
     total_samples = train_size + val_size + test_size
-    samples_remaining = total_samples
+    train_samples_remaining = train_size
+    val_samples_remaining = val_size
+    test_samples_remaining = test_size
+    
     
     samples_counter = 0
     train_counter = 0
@@ -84,23 +87,30 @@ def build_matrices():
             train_images[train_counter] = image
             train_labels.append(labels)
             train_counter += 1
+            train_samples_remaining -= 1
+            print(f"train samples remaining: {train_samples_remaining}")
         elif samples_counter < train_size + val_size:
             val_images[val_counter] = image
             val_labels.append(labels)
             val_counter += 1
+            val_samples_remaining -= 1
+            print(f"val samples remaining: {val_samples_remaining}")
         elif samples_counter < total_samples:
             test_images[test_counter] = image
             test_labels.append(labels)
             test_counter += 1
+            test_samples_remaining -= 1
+            print(f"test samples remaining: {test_samples_remaining}")
         else:
             print("samples != samples spots")
             continue
             
             
         samples_counter += 1
-        samples_remaining -= 1
-        print(f"samples remaining: {samples_remaining}")
-        
+
+    
+    print("labels to matices")
+    
     train_images.flush()
     val_images.flush()
     test_images.flush()
@@ -109,7 +119,7 @@ def build_matrices():
     val_labels_matrix = np.stack(val_labels)
     test_labels_matrix = np.stack(test_labels)
     
-    print("copying to drive")
+    print("copying to drive...")
     
     drive_modeling_out = Path("/content/drive/MyDrive/Live-Affect-Analysis/modeling_matrices")
     drive_eval_out = Path("/content/drive/MyDrive/Live-Affect-Analysis/eval_matrices")
@@ -128,21 +138,28 @@ def build_matrices():
         drive_modeling_out / "train_images.npy"
     )
     
+    print("train images complete")
+    
     shutil.copy2(
         local_out / "val.npy",
         drive_modeling_out / "val_images.npy"
     )
     
+    print("val images complete")
+    
     np.save(drive_modeling_out / "train_labels.npy", train_labels_matrix)
     np.save(drive_modeling_out / "val_labels.npy", val_labels_matrix)
+    print("train and val labels complete")
     
     shutil.copy2(
         local_out / "test.npy",
         drive_eval_out / "test_images.npy"
     )
     
-    np.save(drive_eval_out / "test_labels.npy", test_labels_matrix)
+    print("test images complete")
     
+    np.save(drive_eval_out / "test_labels.npy", test_labels_matrix)
+    print("test labels complete")
     print("complete")
     
 if __name__ == "__main__":
