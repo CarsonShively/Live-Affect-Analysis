@@ -1,7 +1,7 @@
 import tensorflow as tf
 from pathlib import Path
 import numpy as np
-from live_affect_analysis.baseline_cnn import BaselineCNN
+from live_affect_analysis.affect_analysis_cnn import AffectAnalysisCNN
 from huggingface_hub import get_token, HfApi
 import shutil
 
@@ -46,7 +46,7 @@ def train_model():
     print(f"train images shape: {train_images_tensor.shape}")
     print(f"val images shape: {val_images_tensor.shape}")
     
-    model = BaselineCNN()
+    model = AffectAnalysisCNN()
     
     optimizer = tf.keras.optimizers.Adam(learning_rate=3e-4)
     
