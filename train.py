@@ -25,3 +25,6 @@ def train_model():
     print(f"val images shape: {val_images_tensor.shape}")
     print(f"train labels shape: {train_labels_tensor.shape}")
     print(f"val labels shape: {val_labels_tensor.shape}")
+    
+if __name__ == "__main__":
+    train_model()
