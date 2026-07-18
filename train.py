@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 
 def train_model():
-    train_path = Path("/content/drive/MyDrive/Live-Affect_analysis/modeling_matrices")
+    train_path = Path("/content/drive/MyDrive/Live-Affect-Analysis/modeling_matrices")
     
     train_images = np.load(train_path / "train_images.npy")
     train_images_tensor = tf.convert_to_tensor(train_images, dtype=tf.uint8)
