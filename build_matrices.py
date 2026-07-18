@@ -75,6 +75,7 @@ def build_matrices():
     
     for file in local_images_path.iterdir():
         name = file.stem
+        image_id = f"HECO_{name}.png"
         image = np.load(file)
         
         labels = []
