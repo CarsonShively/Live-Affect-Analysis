@@ -12,6 +12,8 @@ class AffectAnalysisCNN(tf.keras.Model):
 
         self.pool = tf.keras.layers.MaxPooling2D(pool_size=(2, 2), strides=(2, 2))
         self.gobal_pool = tf.keras.layers.GlobalAveragePooling2D()
+        
+        self.rescale = tf.keras.layers.Rescaling(1 / 255.0)
 
         self.dropout = tf.keras.layers.Dropout(self.dropout_value)
 
@@ -39,6 +41,7 @@ class AffectAnalysisCNN(tf.keras.Model):
         self.dominance_head = tf.keras.layers.Dense(1)
 
     def call(self, x, training=False):
+        x = self.rescale(x)
         x_1 = self.conv1(x)
         x_2 = self.conv2(x_1)
         x_2_pooled = self.pool(x_2)
