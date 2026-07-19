@@ -26,7 +26,7 @@ def process_images():
     
     samples_count = len(df)
     
-    train_size = int(samples_count * 0.70)
+    train_size = int(samples_count * 0.60)
     val_size = int(samples_count * 0.10)
     test_size = samples_count - train_size - val_size 
     
@@ -76,11 +76,27 @@ def process_images():
             
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             
+            height, width = image.shape[:2]
+            
             x_min = int(row["xmin"])
             x_max = int(row["xmax"])
             y_min = int(row["ymin"])
             y_max = int(row["ymax"])
-            cropped_image = image[y_min:y_max, x_min:x_max]
+            
+            pad_ratio = 0.20
+            
+            box_width = x_max - x_min
+            box_height = y_max - y_min
+            
+            x_padding = int(box_width * pad_ratio)
+            y_padding = int(box_height * pad_ratio)
+            
+            x_min_padded = max(x_min - x_padding, 0)
+            x_max_padded = min(x_max + x_padding, width)
+            y_min_padded = max(y_min - y_padding, 0)
+            y_max_padded = min(y_max + y_padding, height)
+            
+            cropped_image = image[y_min_padded:y_max_padded, x_min_padded:x_max_padded]
             image_tensor = tf.convert_to_tensor(cropped_image, dtype=tf.float32)
             image_tensor_resized = tf.image.resize_with_pad(
                 image_tensor,
@@ -104,20 +120,23 @@ def process_images():
 
             if train_counter < train_size:
                 train_images[train_counter] = image_numpy
+                train_labels.append(labels)
                 train_counter += 1
                 print(f"train remaining: {train_size - train_counter}")
-                train_labels.append(labels)
+                
             elif val_counter < val_size:
                 val_images[val_counter] = image_numpy
+                val_labels.append(labels)
                 val_counter += 1
                 print(f"val remaining: {val_size - val_counter}")
-                val_labels.append(labels)
+                
             else:
                 test_images[test_counter] = image_numpy
+                test_labels.append(labels)
                 test_counter += 1
                 test_remaining = test_size - test_counter
                 print(f"test remaining: {test_remaining}")
-                test_labels.append(labels)
+                
 
         except Exception as error:
             print(f"Error file: {image_path.name}: {error}")

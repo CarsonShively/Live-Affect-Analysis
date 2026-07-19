@@ -135,12 +135,12 @@ class GatedFeatureFusion(tf.keras.Model):
         dominance = self.dominance_hidden(dominance)
         
                 
-        category = self.category_norm(category)
-        satisfaction = self.satisfaction_norm(satisfaction)
-        calmness = self.calmness_norm(calmness)
-        valence = self.valence_norm(valence)
-        arousal = self.arousal_norm(arousal)
-        dominance = self.dominance_norm(dominance)
+        category = self.category_norm(category, training=training)
+        satisfaction = self.satisfaction_norm(satisfaction, training=training)
+        calmness = self.calmness_norm(calmness, training=training)
+        valence = self.valence_norm(valence, training=training)
+        arousal = self.arousal_norm(arousal, training=training)
+        dominance = self.dominance_norm(dominance, training=training)
         
                 
         category = tf.keras.activations.gelu(category)
