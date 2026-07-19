@@ -19,6 +19,12 @@ def train_model():
     train_labels = np.load(train_path / "train_labels.npy")
     val_labels = np.load(train_path / "val_labels.npy")
     
+    train_labels = train_labels[:, 1] / 
+    train_labels = train_labels[:, 2] / 
+    train_labels = train_labels[:, 3] / 
+    train_labels = train_labels[:, 4] / 
+    train_labels = train_labels[:, 5] / 
+    
     train_labels_tensors = {
         "category": tf.convert_to_tensor(train_labels[:, 0], dtype=tf.int32),
         "satisfaction": tf.convert_to_tensor(train_labels[:, 1:2], dtype=tf.float32),

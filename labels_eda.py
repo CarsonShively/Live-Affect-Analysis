@@ -8,5 +8,8 @@ def labels_eda():
     print(df["Category"].unique())
     print(df["Label_SA"].unique())
     print(df["Label_CA"].unique())
+    print(df["Valence"].max())
+    print(df["Arousal"].max())
+    print(df["Dominance"].max())
 if __name__ == "__main__":
     labels_eda()
