@@ -21,7 +21,6 @@ def process_images():
         )
     
     df = pd.read_csv(labels_path)
-    df = df.sample(frac=1, random_state=42).reset_index(drop=True)
     
     print("data mounted")
     

@@ -1,7 +1,7 @@
 import tensorflow as tf
 from pathlib import Path
 import numpy as np
-from live_affect_analysis.affect_analysis_cnn import AffectAnalysisCNN
+from live_affect_analysis.gated_feature_fusion import GatedFeatureFusion
 from huggingface_hub import get_token, HfApi
 import shutil
 
@@ -46,9 +46,9 @@ def train_model():
     print(f"train images shape: {train_images_tensor.shape}")
     print(f"val images shape: {val_images_tensor.shape}")
     
-    model = AffectAnalysisCNN()
+    model = GatedFeatureFusion()
     
-    optimizer = tf.keras.optimizers.Adam(learning_rate=3e-4)
+    optimizer = tf.keras.optimizers.AdamW(learning_rate=3e-4, weight_decay=1e-4)
     
     losses = {
         "category": tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -84,9 +84,9 @@ def train_model():
         train_images_tensor,
         train_labels_tensors,
         validation_data=(val_images_tensor, val_labels_tensors),
-        batch_size=4,
-        epochs=300
-        #callbacks=[early_stopping]
+        batch_size=32,
+        epochs=100,
+        callbacks=[early_stopping]
     )
     
     model_out = Path("/content/model")
@@ -94,15 +94,15 @@ def train_model():
         shutil.rmtree(model_out)
     model_out.mkdir(parents=True, exist_ok=True)    
     
-    model.save_weights(model_out / "baseline_affect_analysis.weights.h5")
+    model.save_weights(model_out / "gated_feature_fusion.weights.h5")
     
     if get_token() != None:
         api = HfApi()
         api.upload_file(
             repo_id="Carson-Shively/Affect-Analysis",
             repo_type="model",
-            path_or_fileobj=model_out / "baseline_affect_analysis.weights.h5",
-            path_in_repo="baseline_affect_analysis.weights.h5"
+            path_or_fileobj=model_out / "gated_feature_fusion.weights.h5",
+            path_in_repo="gated_feature_fusion.weights.h5"
         )
     
 if __name__ == "__main__":
