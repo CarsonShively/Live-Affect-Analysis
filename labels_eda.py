@@ -11,5 +11,8 @@ def labels_eda():
     print(df["Valence"].max())
     print(df["Arousal"].max())
     print(df["Dominance"].max())
+    print(df["Valence"].min())
+    print(df["Arousal"].min())
+    print(df["Dominance"].min())
 if __name__ == "__main__":
     labels_eda()
