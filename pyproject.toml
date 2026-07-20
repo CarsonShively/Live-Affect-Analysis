@@ -16,7 +16,8 @@ dependencies = [
     "huggingface-hub>=1,<2",
     "streamlit>=1.59,<1.60",
     "datasets>=3.6.0,<4.0.0",
-    "opencv-python>=4.13,<5"
+    "opencv-python>=4.13,<5",
+    "scipy>=1.1,<2.0"
 ]
 
 [tool.setuptools.packages.find]
