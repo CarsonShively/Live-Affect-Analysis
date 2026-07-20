@@ -16,23 +16,20 @@ def train_model():
     val_images_tensor = tf.convert_to_tensor(val_images, dtype=tf.uint8)
     del val_images
     
-    train_labels = np.load(train_path / "train_labels.npy")
-    val_labels = np.load(train_path / "val_labels.npy")
+    train_labels = np.load(train_path / "train_labels.npy").astype(np.float32)
+    val_labels = np.load(train_path / "val_labels.npy").astype(np.float32)
     
-    train_labels = train_labels.astype(np.float32)
-    val_labels = val_labels.astype(np.float32)
+    train_labels[:, 1] /= 4.0
+    train_labels[:, 2] /= 3.0
+    train_labels[:, 3] /= 10.0
+    train_labels[:, 4] /= 10.0
+    train_labels[:, 5] /= 10.0
     
-    train_labels = train_labels[:, 1] / 5
-    train_labels = train_labels[:, 2] / 4
-    train_labels = train_labels[:, 3] / 10
-    train_labels = train_labels[:, 4] / 10
-    train_labels = train_labels[:, 5] / 10
-    
-    val_labels = val_labels[:, 1] / 4
-    val_labels = val_labels[:, 2] / 3
-    val_labels = val_labels[:, 3] / 10
-    val_labels = val_labels[:, 4] / 10
-    val_labels = val_labels[:, 5] / 10
+    val_labels[:, 1] /= 4.0
+    val_labels[:, 2] /= 3.0
+    val_labels[:, 3] /= 10.0
+    val_labels[:, 4] /= 10.0
+    val_labels[:, 5] /= 10.0
     
     train_labels_tensors = {
         "category": tf.convert_to_tensor(train_labels[:, 0], dtype=tf.int32),
@@ -71,12 +68,12 @@ def train_model():
     }
     
     loss_weights = {
-        "category": 1,
-        "satisfaction": 1,
-        "calmness": 1,
-        "valence": 1,
-        "arousal": 1,
-        "dominance": 1
+        "category": 1.0,
+        "satisfaction": 5.0,
+        "calmness": 5.0,
+        "valence": 5.0,
+        "arousal": 5.0,
+        "dominance": 5.0
     }
     
     model.compile(
