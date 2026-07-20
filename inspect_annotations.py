@@ -12,6 +12,7 @@ def inspect_annotations():
     
     print(f"train type: {type(train)}")
     print(f"train shape: {train.shape}")
+    print(f"train item type {type(train[0])}")
      
 if __name__ == "__main__":
     inspect_annotations()
