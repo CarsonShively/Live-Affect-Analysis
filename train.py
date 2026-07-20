@@ -1,7 +1,7 @@
 import tensorflow as tf
 from pathlib import Path
 import numpy as np
-from live_affect_analysis.gated_feature_fusion import GatedFeatureFusion
+from live_affect_analysis.frozen_test import FrozenTest
 from huggingface_hub import get_token, HfApi
 import shutil
 
@@ -54,7 +54,7 @@ def train_model():
     print(f"train images shape: {train_images_tensor.shape}")
     print(f"val images shape: {val_images_tensor.shape}")
     
-    model = GatedFeatureFusion()
+    model = FrozenTest()
     
     optimizer = tf.keras.optimizers.AdamW(learning_rate=3e-4, weight_decay=1e-4)
     
@@ -104,14 +104,14 @@ def train_model():
     
     model.save_weights(model_out / "gated_feature_fusion.weights.h5")
     
-    if get_token() != None:
+"""    if get_token() != None:
         api = HfApi()
         api.upload_file(
             repo_id="Carson-Shively/Affect-Analysis",
             repo_type="model",
             path_or_fileobj=model_out / "gated_feature_fusion.weights.h5",
             path_in_repo="gated_feature_fusion.weights.h5"
-        )
+        )"""
     
 if __name__ == "__main__":
     train_model()
