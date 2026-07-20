@@ -2,6 +2,7 @@ category_map = {
     "Peace": 0,
     "Disgust": 1,
     "Happiness": 2,
+    "Happinesst": 2,
     "Anger": 3,
     "Sadness": 4,
     "Excitement": 5,

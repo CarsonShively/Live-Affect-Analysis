@@ -14,5 +14,8 @@ def labels_eda():
     print(df["Valence"].min())
     print(df["Arousal"].min())
     print(df["Dominance"].min())
+    
+    print(df.isna().sum())
+    
 if __name__ == "__main__":
     labels_eda()
