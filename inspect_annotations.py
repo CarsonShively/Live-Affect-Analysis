@@ -6,7 +6,7 @@ def inspect_annotations():
     
     print(whosmat(mat_path))
     
-    annotations = loadmat(mat_path, structs_as_record=False, squeeze_me=True)
+    annotations = loadmat(mat_path, struct_as_record=False, squeeze_me=True)
      
     train = annotations["train"]
     
