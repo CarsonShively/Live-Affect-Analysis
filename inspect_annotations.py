@@ -14,6 +14,13 @@ def inspect_annotations():
     print(f"train shape: {train.shape}")
     print(f"train item type {type(train[0])}")
     print(f"train item fields {train[0]._fieldnames}")
+    
+    print(f"filename {type(train[0].filename)}")
+    print(f"folder {type(train[0].folder)}")
+    print(f"image size {type(train[0].image_size)}")
+    print(f"original database {type(train[0].filenaoriginal_databaseme)}")
+    print(f"person {type(train[0].person)}")
+     
      
 if __name__ == "__main__":
     inspect_annotations()
