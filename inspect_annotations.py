@@ -18,7 +18,7 @@ def inspect_annotations():
     print(f"filename {type(train[0].filename)}")
     print(f"folder {type(train[0].folder)}")
     print(f"image size {type(train[0].image_size)}")
-    print(f"original database {type(train[0].filenaoriginal_databaseme)}")
+    print(f"original database {type(train[0].original_database)}")
     print(f"person {type(train[0].person)}")
      
      
