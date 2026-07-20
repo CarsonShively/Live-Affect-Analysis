@@ -17,7 +17,7 @@ def build_categories_dictionary():
     dictionary_id = 0
     
     
-    for sample in np.atleast_1d(train):
+    for sample in train:
         for person in np.atleast_1d(sample.person):
             for category in np.atleast_1d(person.annotations_categories.categories):
                 category = str(category)

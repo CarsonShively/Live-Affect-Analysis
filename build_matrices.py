@@ -40,26 +40,41 @@ def build_matrices():
     val = annotations["val"]
     test = annotations["test"]
     
+    train_len = 0
+    for sample in train:
+        for person in np.atleast_1d(sample.person):
+            train_len += 1
+    
+    val_len = 0
+    for sample in val:
+        for person in np.atleast_1d(sample.person):
+            val_len += 1
+            
+    test_len = 0
+    for sample in test:
+        for person in np.atleast_1d(sample.person):
+            test_len += 1
+    
     local_out = Path("/content/matrices")
     
     train_images = np.lib.format.open_memmap(
         local_out / "train.npy",
         mode="w+",
         dtype=np.uint8,
-        shape=(train.shape[0], 224, 224, 3)
+        shape=(train_len, 224, 224, 3)
     )
     
     val_images = np.lib.format.open_memmap(
         local_out / "val.npy",
         mode="w+",
         dtype=np.uint8,
-        shape=(val.shape[0], 224, 224, 3)
+        shape=(val_len, 224, 224, 3)
     )
     test_images = np.lib.format.open_memmap(
         local_out / "test.npy",
         mode="w+",
         dtype=np.uint8,
-        shape=(test.shape[0], 224, 224, 3)
+        shape=(test_len, 224, 224, 3)
     )
     
     train_labels = []
@@ -70,6 +85,7 @@ def build_matrices():
     for split, image_out, label_out, split_string in splits:
         total = split.shape[0]
         print_remaining = 500
+        append_index = 0
         for index, sample in enumerate(split):
             image_folder = sample.folder
             image_file = sample.filename
@@ -77,54 +93,57 @@ def build_matrices():
             
             image = cv2.imread(str(image_path))
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        
-            left, top, right, bottom = sample.person.body_bbox
-            
-            image = image[top:bottom, left:right]
-        
-            image_tensor = tf.convert_to_tensor(image, dtype=tf.float32)
-            image_tensor_resized = tf.image.resize_with_pad(
-                image_tensor,
-                target_height=224,
-                target_width=224
-            )
-            image_numpy = tf.cast(
-                tf.round(image_tensor_resized),
-                tf.uint8
-            ).numpy()
-            
-            labels = np.zeros(shape=label_len)
 
-            categories = sample.person.annotations_categories
+            for person in np.atleast_1d(sample.person):
             
-            for category in categories:
-                if category in dictionary:
-                    labels[dictionary[category]] = 1
-                else:
-                    continue
+                left, top, right, bottom = person.body_bbox
                 
-            labels[dictionary_len] = sample.person.annotations_continuous.valence
-            labels[dictionary_len+1] = sample.person.annotations_continuous.valence
-            labels[dictionary_len+2] = sample.person.annotations_continuous.valence
+                image = image[top:bottom, left:right]
             
-            if sample.person.gender == "Male":
-                labels[dictionary_len+3] = 1
-            elif sample.person.gender == "Female":
-                labels[dictionary_len+3] = 0
-            else:
-                raise ValueError("gender value error")
-            
-            if sample.person.age == "Kid":
-                labels[dictionary_len+4] = 0
-            elif sample.person.age == "Teenager":
-                labels[dictionary_len+4] = 1
-            elif sample.person.age == "Adult":
-                labels[dictionary_len+4] = 2
-            else:
-                raise ValueError("age value error")
-            
-            image_out[index] = image_numpy
-            label_out.append(labels)
+                image_tensor = tf.convert_to_tensor(image, dtype=tf.float32)
+                image_tensor_resized = tf.image.resize_with_pad(
+                    image_tensor,
+                    target_height=224,
+                    target_width=224
+                )
+                image_numpy = tf.cast(
+                    tf.round(image_tensor_resized),
+                    tf.uint8
+                ).numpy()
+                
+                labels = np.zeros(shape=label_len)
+
+                
+                
+                for category in np.atleast_1d(person.annotations_categories.categories):
+                    if category in dictionary:
+                        labels[dictionary[category]] = 1
+                    else:
+                        continue
+                    
+                labels[dictionary_len] = person.annotations_continuous.valence
+                labels[dictionary_len+1] = person.annotations_continuous.valence
+                labels[dictionary_len+2] = person.annotations_continuous.valence
+                
+                if person.gender == "Male":
+                    labels[dictionary_len+3] = 1
+                elif person.gender == "Female":
+                    labels[dictionary_len+3] = 0
+                else:
+                    raise ValueError(f"gender value error sample: {index}")
+                
+                if person.age == "Kid":
+                    labels[dictionary_len+4] = 0
+                elif person.age == "Teenager":
+                    labels[dictionary_len+4] = 1
+                elif person.age == "Adult":
+                    labels[dictionary_len+4] = 2
+                else:
+                    raise ValueError(f"age value error sample: {index}")
+                
+                image_out[append_index] = image_numpy
+                append_index += 1
+                label_out.append(labels)
         
             if index == print_remaining:
                 print(f"{split_string} remaining: {total-index+1}")
