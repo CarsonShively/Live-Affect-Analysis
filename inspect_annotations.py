@@ -35,7 +35,7 @@ def inspect_annotations():
     
     print(f"cat fields {((train[0].person).annotations_categories)._fieldnames}")
     print(f"cat type {type(((train[0].person).annotations_categories).categories)}")
-    print(f"cat item type {type((((train[0].person).annotations_categories).categories)[0])}")
+    print(f"cat item type {((((train[0].person).annotations_categories).categories)[0]).fieldnames}")
     
 if __name__ == "__main__":
     inspect_annotations()
