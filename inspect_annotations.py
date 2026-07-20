@@ -31,6 +31,7 @@ def inspect_annotations():
     print(f"person field types {type((train[0].person).body_bbox)}, {type((train[0].person).annotations_categories)}, {type((train[0].person).annotations_continuous)}, {type((train[0].person).gender)}, {type((train[0].person).age)}")
     
     print(f"bbox item {type(((train[0].person).body_bbox)[0])}")
+    print(f"bbox len {len((train[0].person).body_bbox)}")
     
 if __name__ == "__main__":
     inspect_annotations()
