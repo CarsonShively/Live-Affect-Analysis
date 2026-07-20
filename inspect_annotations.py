@@ -10,7 +10,7 @@ def inspect_annotations():
      
     train = annotations["train"]
     
-    print(train[0].person.annotations_categories._fieldnames)
+    print(train[0].person.annotations_categories.categories._fieldnames)
     
 if __name__ == "__main__":
     inspect_annotations()
