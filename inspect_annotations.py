@@ -21,6 +21,8 @@ def inspect_annotations():
     print(f"original database {type(train[0].original_database)}")
     print(f"person {type(train[0].person)}")
      
-     
+    print(f"image size {(train[0].image_size)._fieldnames}")
+    print(f"original database {(train[0].original_database)._fieldnames}")
+    print(f"person {(train[0].person)._fieldnames}")
 if __name__ == "__main__":
     inspect_annotations()
