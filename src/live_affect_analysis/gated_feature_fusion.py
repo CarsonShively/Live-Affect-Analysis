@@ -61,11 +61,11 @@ class GatedFeatureFusion(tf.keras.Model):
         self.dominance_norm = tf.keras.layers.BatchNormalization()
         
         self.category_head = tf.keras.layers.Dense(8)
-        self.satisfaction_head = tf.keras.layers.Dense(1)
-        self.calmness_head = tf.keras.layers.Dense(1)
-        self.valence_head = tf.keras.layers.Dense(1)
-        self.arousal_head = tf.keras.layers.Dense(1)
-        self.dominance_head = tf.keras.layers.Dense(1)
+        self.satisfaction_head = tf.keras.layers.Dense(1, activation="sigmoid")
+        self.calmness_head = tf.keras.layers.Dense(1, activation="sigmoid")
+        self.valence_head = tf.keras.layers.Dense(1, activation="sigmoid")
+        self.arousal_head = tf.keras.layers.Dense(1, activation="sigmoid")
+        self.dominance_head = tf.keras.layers.Dense(1, activation="sigmoid")
         
     def call(self, x, training=False):
         
