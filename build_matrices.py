@@ -2,39 +2,182 @@ from pathlib import Path
 from scipy import loadmat
 import cv2
 import tensorflow as tf
+import shutil
+from huggingface_hub import snapshot_download
+import json
+import numpy as np
 
 def build_matrices():
-    emotica_path = Path("/content/drive/MyDrive/Live-Affect-Analysis/emotica")
-    annotations_path = emotica_path / "annotations/Annotations.mat"
+    
+    dictionary_path = Path(snapshot_download(
+        repo_id="Carson-Shively/Affect-Analysis",
+        repo_type="model",
+        allow_patterns="category_dictionary.json"
+    ))
+    
+    with open(dictionary_path / "category_dictionary.json", "r") as con:
+        dictionary = json.load(con)
+    
+    dictionary_len = len(dictionary)
+    
+    label_len = dictionary_len + 5
+    
+    drive_emotica_path = Path("/content/drive/MyDrive/Live-Affect-Analysis/emotica")
+    
+    local_emotica_path = Path("/content/emotica")
+    
+    if not local_emotica_path.is_dir():
+        shutil.copytree(
+            drive_emotica_path,
+            local_emotica_path
+        )
+    
+    annotations_path = local_emotica_path / "annotations/Annotations.mat"
     
     annotations = loadmat(annotations_path, squeeze_me=True, struct_as_record=False)
     
     train = annotations["train"]
-    train_len = train.shape[0]
+    val = annotations["val"]
+    test = annotations["test"]
     
-    for i in range(train_len):
-        sample = train[i]
-        image_folder = sample.folder
-        image_file = sample.filename
-        image_path = emotica_path / "images" / image_folder / image_file
+    local_out = Path("/content/matrices")
+    
+    train_images = np.lib.format.open_memmap(
+        local_out / "train.npy",
+        mode="w+",
+        dtype=np.uint8,
+        shape=(train.shape[0], 224, 224, 3)
+    )
+    
+    val_images = np.lib.format.open_memmap(
+        local_out / "val.npy",
+        mode="w+",
+        dtype=np.uint8,
+        shape=(val.shape[0], 224, 224, 3)
+    )
+    test_images = np.lib.format.open_memmap(
+        local_out / "test.npy",
+        mode="w+",
+        dtype=np.uint8,
+        shape=(test.shape[0], 224, 224, 3)
+    )
+    
+    train_labels = []
+    val_labels = []
+    test_labels = []
+    
+    splits = [(train, train_images, train_labels, "train"), (val, val_images, val_labels, "val"), (test, test_images, test_labels, "test")]
+    for split, image_out, label_out, split_string in splits:
+        total = split.shape[0]
+        print_remaining = 500
+        for index, sample in enumerate(split):
+            image_folder = sample.folder
+            image_file = sample.filename
+            image_path = local_emotica_path / "images" / image_folder / image_file
+            
+            image = cv2.imread(str(image_path))
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         
-        image = cv2.imread(str(image_path))
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    
-        left, top, right, bottom = sample.person.body_bbox
+            left, top, right, bottom = sample.person.body_bbox
+            
+            image = image[top:bottom, left:right]
         
-        image = image[top:bottom, left:right]
+            image_tensor = tf.convert_to_tensor(image, dtype=tf.float32)
+            image_tensor_resized = tf.image.resize_with_pad(
+                image_tensor,
+                target_height=224,
+                target_width=224
+            )
+            image_numpy = tf.cast(
+                tf.round(image_tensor_resized),
+                tf.uint8
+            ).numpy()
+            
+            labels = np.zeros(shape=label_len)
+
+            categories = sample.person.annotations_categories
+            
+            for category in categories:
+                if category in dictionary:
+                    labels[dictionary[category]] = 1
+                else:
+                    continue
+                
+            labels[dictionary_len] = sample.person.annotations_continuous.valence
+            labels[dictionary_len+1] = sample.person.annotations_continuous.valence
+            labels[dictionary_len+2] = sample.person.annotations_continuous.valence
+            
+            if sample.person.gender == "Male":
+                labels[dictionary_len+3] = 1
+            elif sample.person.gender == "Female":
+                labels[dictionary_len+3] = 0
+            else:
+                raise ValueError("gender value error")
+            
+            if sample.person.age == "Kid":
+                labels[dictionary_len+4] = 0
+            elif sample.person.age == "Teenager":
+                labels[dictionary_len+4] = 1
+            elif sample.person.age == "Adult":
+                labels[dictionary_len+4] = 2
+            else:
+                raise ValueError("age value error")
+            
+            image_out[index] = image_numpy
+            label_out.append(labels)
+        
+            if index == print_remaining:
+                print(f"{split_string} remaining: {total-index+1}")
+                print_remaining += 500
+        
+    train_images.flush()
+    val_images.flush()
+    test_images.flush()
+        
+    train_labels_matrix = np.array(train_labels)
+    val_labels_matrix = np.array(val_labels)
+    test_labels_matrix = np.array(test_labels)
     
-        image_tensor = tf.convert_to_tensor(image, dtype=tf.float32)
-        image_tensor_resized = tf.image.resize_with_pad(
-            image_tensor,
-            target_height=224,
-            target_width=224
-        )
-        image_numpy = tf.cast(
-            tf.round(image_tensor_resized),
-            tf.uint8
-        ).numpy()
+    drive_modeling_out = Path("/content/drive/MyDrive/Live-Affect-Analysis/modeling_matrices")
+    drive_eval_out = Path("/content/drive/MyDrive/Live-Affect-Analysis/eval_matrices")
+    
+    if drive_modeling_out.is_dir():
+        shutil.rmtree(drive_modeling_out)
+        
+    if drive_eval_out.is_dir():
+        shutil.rmtree(drive_eval_out)
+        
+    drive_modeling_out.mkdir(parents=True, exist_ok=True)
+    drive_eval_out.mkdir(parents=True, exist_ok=True)
+    
+    shutil.copy2(
+        local_out / "train.npy",
+        drive_modeling_out / "train_images.npy"
+    )
+    
+    print("train images complete")
+    
+    shutil.copy2(
+        local_out / "val.npy",
+        drive_modeling_out / "val_images.npy"
+    )
+    
+    print("val images complete")
+    
+    np.save(drive_modeling_out / "train_labels.npy", train_labels_matrix)
+    np.save(drive_modeling_out / "val_labels.npy", val_labels_matrix)
+    print("train and val labels complete")
+    
+    shutil.copy2(
+        local_out / "test_trimmed.npy",
+        drive_eval_out / "test_images.npy"
+    )
+    
+    print("test images complete")
+    
+    np.save(drive_eval_out / "test_labels.npy", test_labels_matrix)
+    print("test labels complete")
+    print("complete")
     
 if __name__ == "__main__":
     build_matrices()
