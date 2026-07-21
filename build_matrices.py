@@ -140,7 +140,7 @@ def build_matrices():
                         else:
                             continue
                 else:
-                    for category in np.atleast_1d(person.annotations_categories.categories):
+                    for category in np.atleast_1d(person.combined_categories):
                         category = str(category)
                         if category in dictionary:
                             labels[dictionary[category]] = 1
