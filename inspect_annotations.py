@@ -8,9 +8,9 @@ def inspect_annotations():
     
     annotations = loadmat(mat_path, struct_as_record=False, squeeze_me=True)
      
-    train = annotations["train"]
+    test = annotations["test"]
     
-    print(train[0].person.annotations_categories.categories[0])
+    print(test[0].person.annotations_continuous.categories[0])
     
 if __name__ == "__main__":
     inspect_annotations()

@@ -132,17 +132,29 @@ def build_matrices():
                 labels = np.zeros(shape=label_len, dtype=np.float32)
 
                 
+                if split_string == "train":
+                    for category in np.atleast_1d(person.annotations_categories.categories):
+                        category = str(category)
+                        if category in dictionary:
+                            labels[dictionary[category]] = 1
+                        else:
+                            continue
+                else:
+                    for category in np.atleast_1d(person.annotations_categories.categories):
+                        category = str(category)
+                        if category in dictionary:
+                            labels[dictionary[category]] = 1
+                        else:
+                            continue
                 
-                for category in np.atleast_1d(person.annotations_categories.categories):
-                    category = str(category)
-                    if category in dictionary:
-                        labels[dictionary[category]] = 1
-                    else:
-                        continue
-                    
-                labels[dictionary_len] = person.annotations_continuous.valence
-                labels[dictionary_len+1] = person.annotations_continuous.arousal
-                labels[dictionary_len+2] = person.annotations_continuous.dominance
+                if split_string == "train":
+                    labels[dictionary_len] = person.annotations_continuous.valence
+                    labels[dictionary_len+1] = person.annotations_continuous.arousal
+                    labels[dictionary_len+2] = person.annotations_continuous.dominance
+                else:
+                    labels[dictionary_len] = person.combined_continuous.valence
+                    labels[dictionary_len+1] = person.combined_continuous.arousal
+                    labels[dictionary_len+2] = person.combined_continuous.dominance
                 
                 if person.gender == "Male":
                     labels[dictionary_len+3] = 1
@@ -163,6 +175,8 @@ def build_matrices():
                 image_out[append_index] = image_numpy
                 append_index += 1
                 label_out.append(labels)
+                
+                
             if index == print_remaining:
                 print(f"{split_string} remaining: {total-index-1}")
                 print_remaining += 500
