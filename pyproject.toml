@@ -17,7 +17,9 @@ dependencies = [
     "streamlit>=1.59,<1.60",
     "datasets>=3.6.0,<4.0.0",
     "opencv-python>=4.13,<5",
-    "scipy>=1.1,<2.0"
+    "scipy>=1.1,<2.0",
+    "streamlit-webrtc>=0.76.2,<0.77.0",
+    "ultralytics>=8.4,<8.5"
 ]
 
 [tool.setuptools.packages.find]
