@@ -1,5 +1,6 @@
 import numpy as np
 from pathlib import Path
+import pandas as pd
 
 def matrices_eda():
     modeling_path = Path("/content/drive/MyDrive/Live-Affect-Analysis/modeling_matrices")
@@ -25,6 +26,13 @@ def matrices_eda():
     
     test_labels = np.load(eval_path / "test_labels.npy")
     print(f"train labels shpae: {test_labels.shape}")
+
+    inf_mask = np.isinf(train_labels)
+    print(inf_mask.sum())
+
+    train_labels_df = pd.DataFrame(train_labels)
+    print(train_labels_df.head())
+    print(train_labels_df.isna().sum())
 
 if __name__ == "__main__":
     matrices_eda()
