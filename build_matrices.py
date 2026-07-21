@@ -1,5 +1,5 @@
 from pathlib import Path
-from scipy import loadmat
+from scipy.io import loadmat
 import cv2
 import tensorflow as tf
 import shutil
@@ -57,6 +57,11 @@ def build_matrices():
     
     local_out = Path("/content/matrices")
     
+    if local_out.is_dir():
+        shutil.rmtree(local_out)
+        
+    local_out.mkdir(parents=True, exist_ok=True)
+    
     train_images = np.lib.format.open_memmap(
         local_out / "train.npy",
         mode="w+",
@@ -94,13 +99,23 @@ def build_matrices():
             image = cv2.imread(str(image_path))
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
+            height, width = image.shape[:2]
+
             for person in np.atleast_1d(sample.person):
             
                 left, top, right, bottom = person.body_bbox
                 
-                image = image[top:bottom, left:right]
+                left = int(left)
+                top = int(top)
+                right = int(right)
+                bottom = int(bottom)
+                
+                if left < 0 or right > width or top < 0 or bottom > height or right <= left or bottom <= top:
+                    raise ValueError("crop size error")
+                
+                image_cropped = image[top:bottom, left:right]
             
-                image_tensor = tf.convert_to_tensor(image, dtype=tf.float32)
+                image_tensor = tf.convert_to_tensor(image_cropped, dtype=tf.float32)
                 image_tensor_resized = tf.image.resize_with_pad(
                     image_tensor,
                     target_height=224,
@@ -111,19 +126,20 @@ def build_matrices():
                     tf.uint8
                 ).numpy()
                 
-                labels = np.zeros(shape=label_len)
+                labels = np.zeros(shape=label_len, dtype=np.float32)
 
                 
                 
                 for category in np.atleast_1d(person.annotations_categories.categories):
+                    category = str(category)
                     if category in dictionary:
                         labels[dictionary[category]] = 1
                     else:
                         continue
                     
                 labels[dictionary_len] = person.annotations_continuous.valence
-                labels[dictionary_len+1] = person.annotations_continuous.valence
-                labels[dictionary_len+2] = person.annotations_continuous.valence
+                labels[dictionary_len+1] = person.annotations_continuous.arousal
+                labels[dictionary_len+2] = person.annotations_continuous.dominance
                 
                 if person.gender == "Male":
                     labels[dictionary_len+3] = 1
@@ -144,10 +160,10 @@ def build_matrices():
                 image_out[append_index] = image_numpy
                 append_index += 1
                 label_out.append(labels)
-        
             if index == print_remaining:
-                print(f"{split_string} remaining: {total-index+1}")
+                print(f"{split_string} remaining: {total-index-1}")
                 print_remaining += 500
+        
         
     train_images.flush()
     val_images.flush()
@@ -188,7 +204,7 @@ def build_matrices():
     print("train and val labels complete")
     
     shutil.copy2(
-        local_out / "test_trimmed.npy",
+        local_out / "test.npy",
         drive_eval_out / "test_images.npy"
     )
     
