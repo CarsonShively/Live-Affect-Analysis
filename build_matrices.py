@@ -148,13 +148,17 @@ def build_matrices():
                             continue
                 
                 if split_string == "train":
-                    labels[dictionary_len] = person.annotations_continuous.valence
-                    labels[dictionary_len+1] = person.annotations_continuous.arousal
-                    labels[dictionary_len+2] = person.annotations_continuous.dominance
+                    continous = np.array([person.annotations_continuous.valence, person.annotations_continuous.arousal, person.annotations_continuous.dominance])
+                    if np.isnan(continous).any():
+                        split_skip_count += 1
+                        continue
+                    labels[dictionary_len:dictionary_len+3] = continous
                 else:
-                    labels[dictionary_len] = person.combined_continuous.valence
-                    labels[dictionary_len+1] = person.combined_continuous.arousal
-                    labels[dictionary_len+2] = person.combined_continuous.dominance
+                    continous = np.array([person.combined_continuous.valence, person.combined_continuous.arousal, person.combined_continuous.dominance])
+                    if np.isnan(continous).any():
+                        split_skip_count += 1
+                        continue
+                    labels[dictionary_len:dictionary_len+3] = continous
                 
                 if person.gender == "Male":
                     labels[dictionary_len+3] = 1
