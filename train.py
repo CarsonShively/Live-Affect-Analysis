@@ -56,7 +56,7 @@ def train_model():
     
     model = FrozenTest()
     
-    optimizer = tf.keras.optimizers.AdamW(learning_rate=3e-4, weight_decay=1e-4)
+    optimizer = tf.keras.optimizers.AdamW(learning_rate=4e-4, weight_decay=5e-4)
     
     losses = {
         "category": tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -104,14 +104,14 @@ def train_model():
     
     model.save_weights(model_out / "gated_feature_fusion.weights.h5")
     
-"""    if get_token() != None:
+    if get_token() != None:
         api = HfApi()
         api.upload_file(
             repo_id="Carson-Shively/Affect-Analysis",
             repo_type="model",
             path_or_fileobj=model_out / "gated_feature_fusion.weights.h5",
             path_in_repo="gated_feature_fusion.weights.h5"
-        )"""
+        )
     
 if __name__ == "__main__":
     train_model()

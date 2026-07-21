@@ -91,6 +91,7 @@ def build_matrices():
         total = split.shape[0]
         print_remaining = 500
         append_index = 0
+        split_skip_count = 0
         for index, sample in enumerate(split):
             image_folder = sample.folder
             image_file = sample.filename
@@ -111,7 +112,9 @@ def build_matrices():
                 bottom = int(bottom)
                 
                 if left < 0 or right > width or top < 0 or bottom > height or right <= left or bottom <= top:
-                    raise ValueError("crop size error")
+                    split_skip_count += 1
+                    print(f"{split_string} skip count: {split_skip_count}")
+                    continue
                 
                 image_cropped = image[top:bottom, left:right]
             
