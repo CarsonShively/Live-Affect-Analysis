@@ -10,7 +10,7 @@ def inspect_annotations():
      
     test = annotations["test"]
     
-    print(test[0].person.combined_categories[0])
+    print(test[0].person.combined_categories)
     
 if __name__ == "__main__":
     inspect_annotations()
