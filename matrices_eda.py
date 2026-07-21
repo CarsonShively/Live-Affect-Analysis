@@ -31,8 +31,19 @@ def matrices_eda():
     print(inf_mask.sum())
 
     train_labels_df = pd.DataFrame(train_labels)
-    print(train_labels_df.head())
     print(train_labels_df.isna().sum())
+
+    inf_mask = np.isinf(train_labels)
+    print(inf_mask.sum())
+
+    val_labels_df = pd.DataFrame(val_labels)
+    print(val_labels_df.isna().sum())
+    
+    inf_mask = np.isinf(test_labels)
+    print(inf_mask.sum())
+
+    test_labels_df = pd.DataFrame(test_labels)
+    print(test_labels_df.isna().sum())
 
 if __name__ == "__main__":
     matrices_eda()
