@@ -69,19 +69,10 @@ def train_model():
         "age": tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
     }
     
-    loss_weights = {
-        "category": 1.0,
-        "valence": 0.1,
-        "arousal": 0.1,
-        "dominance": 0.1,
-        "gender": 1.0,
-        "age": 1.0,
-    }
     
     model.compile(
         optimizer=optimizer,
-        loss=losses,
-        loss_weights=loss_weights
+        loss=losses
     )
      
     early_stopping = tf.keras.callbacks.EarlyStopping(
