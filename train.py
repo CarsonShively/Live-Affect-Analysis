@@ -72,7 +72,8 @@ def train_model():
     
     model.compile(
         optimizer=optimizer,
-        loss=losses
+        loss=losses,
+        jit_compile=False
     )
      
     early_stopping = tf.keras.callbacks.EarlyStopping(

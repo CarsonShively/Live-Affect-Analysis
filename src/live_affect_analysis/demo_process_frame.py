@@ -10,8 +10,6 @@ from pathlib import Path
 
 class ProcessFrame():
     def __init__(self):
-        self.lock = threading.Lock()
-        self.inferencing = False
         self.prediction = None
         self.detector = YOLO("yolo26n.pt")
         
@@ -29,7 +27,7 @@ class ProcessFrame():
         dummy_input = tf.zeros(shape=[1, 224, 224, 3])
         self.model(x=dummy_input)
         self.model.load_weights(model_folder / "gated_feature_fusion.weights.h5")
-        self.status = None
+
     
     def detect_person(self, image):
         result = self.detector(source=image, classes=[0], conf=0.4, verbse=False, imgsz=320)
@@ -54,9 +52,13 @@ class ProcessFrame():
             
             cords = self.detect_person(image)
             if cords == None:
-                self.status = "No Person Detected"
+                output = {
+                    "status": "No Person Detected"
+                }
+                
+                self.prediction = output
+                
             else:
-                self.status = "Person Detected"
                 x1, y1, x2, y2 = cords
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 image = image[y1:y2, x1:x2]
@@ -86,14 +88,18 @@ class ProcessFrame():
                     age = "Adult"
                 
                 output = {
+                    "status": "Person Detected",
                     "age": age,
                     "gender": gender,
-                    "valence": f"Mood                   {int(round(output_dict["valence"]))}/10",
-                    "arousal": f"Energy                 {int(round(output_dict["arousal"]))}/10",
-                    "dominance": f"Assertiveness        {int(round(output_dict["dominance"]))}/10",
-                    "category_1": f"{self.dictionary_list[top_indices[0]]}      {top_values[0]}%",
-                    "category_2": f"{self.dictionary_list[top_indices[1]]}      {top_values[1]}%",
-                    "category_3": f"{self.dictionary_list[top_indices[2]]}      {top_values[2]}%"
+                    "mood": int(round(output_dict["valence"])),
+                    "energy": int(round(output_dict["arousal"])),
+                    "assertiveness": int(round(output_dict["dominance"])),
+                    "category_1_label": self.dictionary_list[top_indices[0]],
+                    "category_1_scores": float(top_values[0]),
+                    "category_2_label": self.dictionary_list[top_indices[1]],
+                    "category_2_scores": float(top_values[1]),
+                    "category_3_label": self.dictionary_list[top_indices[2]],
+                    "category_3_scores": float(top_values[2]),
                 }
                 
                 self.prediction = output
@@ -103,25 +109,5 @@ class ProcessFrame():
         finally:
             with self.lock():
                 self.inferencing = False
-        
-        
-    def build_overlay(self, image):
-        x = 0
-        
-        
-    def recv(self, frame):
-        image = frame.to_ndarray(frame="bgr24")
-        
-        with self.lock():
-            if not self.inferencing:
-                should_score = True
-                self.inferencing = True
-            else:
-                should_score = False                
-            
-        if should_score:
-            self.inference(image)
-            
-        image = self.build_overlay(image)
-            
-        return av.VideoFrame.from_ndarray(image, format="bgr24")
+                    
+                    
