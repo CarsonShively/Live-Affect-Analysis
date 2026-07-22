@@ -1,4 +1,6 @@
 from pathlib import Path
+import os
+os.environ["MPLBACKEND"] = "Agg"
 import tensorflow as tf
 from huggingface_hub import get_token, HfApi
 import json

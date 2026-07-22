@@ -9,23 +9,18 @@ def evaluate():
     eval_path = Path("/content/drive/MyDrive/Live-Affect-Analysis/eval_matrices")
     
     test_images = np.load(eval_path / "test_images.npy")
-    test_labels = np.load(eval_path / "test_labels.npy").astype(np.float32)
+    test_labels = np.load(eval_path / "test_labels.npy")
     
-    test_labels[:, 1] /= 4.0
-    test_labels[:, 2] /= 3.0
-    test_labels[:, 3] /= 10.0
-    test_labels[:, 4] /= 10.0
-    test_labels[:, 5] /= 10.0
     
     test_images_tensor = tf.convert_to_tensor(test_images, dtype=tf.uint8)
     
     test_labels_tensors = {
-        "category": tf.convert_to_tensor(test_labels[:, 0], dtype=tf.int32),
-        "satisfaction": tf.convert_to_tensor(test_labels[:, 1:2], dtype=tf.float32),
-        "calmness": tf.convert_to_tensor(test_labels[:, 2:3], dtype=tf.float32),
-        "valence": tf.convert_to_tensor(test_labels[:, 3:4], dtype=tf.float32),
-        "arousal": tf.convert_to_tensor(test_labels[:, 4:5], dtype=tf.float32),
-        "dominance": tf.convert_to_tensor(test_labels[:, 5:6], dtype=tf.float32)
+        "category": tf.convert_to_tensor(test_labels[:, :26], dtype=tf.float32),
+        "valence": tf.convert_to_tensor(test_labels[:, 26:27], dtype=tf.float32),
+        "arousal": tf.convert_to_tensor(test_labels[:, 27:28], dtype=tf.float32),
+        "dominance": tf.convert_to_tensor(test_labels[:, 28:29], dtype=tf.float32),
+        "gender": tf.convert_to_tensor(test_labels[:, 29:30], dtype=tf.float32),
+        "age": tf.convert_to_tensor(test_labels[:, 30], dtype=tf.int32)
     }
     
     model_weights_path = Path(snapshot_download(
