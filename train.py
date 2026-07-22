@@ -1,9 +1,12 @@
+import os
+os.environ["MPLBACKEND"] = "Agg"
 import tensorflow as tf
 from pathlib import Path
 import numpy as np
 from live_affect_analysis.gated_feature_fusion import GatedFeatureFusion
 from huggingface_hub import get_token, HfApi
 import shutil
+
 
 def train_model():
     train_path = Path("/content/drive/MyDrive/Live-Affect-Analysis/modeling_matrices")
