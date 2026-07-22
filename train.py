@@ -81,7 +81,7 @@ def train_model():
      
     early_stopping = tf.keras.callbacks.EarlyStopping(
         monitor="val_loss",
-        patience=15,
+        patience=10,
         restore_best_weights=True
     )
     
