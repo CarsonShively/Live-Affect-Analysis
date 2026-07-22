@@ -1,4 +1,6 @@
 from pathlib import Path
+import os
+os.environ["MPLBACKEND"] = "Agg"
 import tensorflow as tf
 import numpy as np
 from huggingface_hub import snapshot_download, get_token, HfApi
@@ -38,26 +40,18 @@ def evaluate():
     model.load_weights(model_weights_path / "gated_feature_fusion.weights.h5")
     
     losses = {
-        "category": tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-        "satisfaction": tf.keras.losses.MeanSquaredError(),
-        "calmness": tf.keras.losses.MeanSquaredError(),
+        "category": tf.keras.losses.BinaryCrossentropy(from_logits=True),
         "valence": tf.keras.losses.MeanSquaredError(),
         "arousal": tf.keras.losses.MeanSquaredError(),
-        "dominance": tf.keras.losses.MeanSquaredError()
+        "dominance": tf.keras.losses.MeanSquaredError(),
+        "gender": tf.keras.losses.BinaryCrossentropy(from_logits=True),
+        "age": tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
     }
     
-    loss_weights = {
-        "category": 1.0,
-        "satisfaction": 5.0,
-        "calmness": 5.0,
-        "valence": 5.0,
-        "arousal": 5.0,
-        "dominance": 5.0
-    }
     
     model.compile(
         loss=losses,
-        loss_weights=loss_weights
+        jit_compile=False
     )
     
     out = model.evaluate(
@@ -84,7 +78,7 @@ def evaluate():
             repo_id="Carson-Shively/Affect-Analysis",
             repo_type="model",
             path_or_fileobj=out_path,
-            path_in_repo="benchmark.json"
+            path_in_repo="evaluation_report.json"
         )
 if __name__ == "__main__":
     evaluate()
