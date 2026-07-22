@@ -13,8 +13,11 @@ def evaluate():
     test_images = np.load(eval_path / "test_images.npy")
     test_labels = np.load(eval_path / "test_labels.npy")
     
+    test_len = test_labels.shape[0]
     
     test_images_tensor = tf.convert_to_tensor(test_images, dtype=tf.uint8)
+    
+    test_images_tensor = test_images_tensor[:test_len]
     
     test_labels_tensors = {
         "category": tf.convert_to_tensor(test_labels[:, :26], dtype=tf.float32),
