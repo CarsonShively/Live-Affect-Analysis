@@ -60,7 +60,7 @@ def benchmark():
     ar_loss = mse(val_arousal, mean_ar)
     dom_loss = mse(val_dominance, mean_dom)
     gender_loss = bce(val_gender, gender_mean)
-    age_loss = sce(val_age, age_mean)
+    age_loss = sce(val_age, mean_age)
     
     loss = cat_loss + gender_loss + age_loss + val_loss + ar_loss + dom_loss
     
