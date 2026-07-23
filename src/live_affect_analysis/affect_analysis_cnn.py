@@ -45,19 +45,20 @@ class AffectAnalysisCNN(tf.keras.Model):
         self.linear1 = tf.keras.layers.Dense(256, activation="gelu")
         self.linear2 = tf.keras.layers.Dense(128, activation="gelu")
         
-        self.category_hidden = tf.keras.layers.Dense(64, activation="gelu")
-        self.satisfaction_hidden = tf.keras.layers.Dense(64, activation="gelu")
-        self.calmness_hidden = tf.keras.layers.Dense(64, activation="gelu")
-        self.valence_hidden = tf.keras.layers.Dense(64, activation="gelu")
-        self.arousal_hidden = tf.keras.layers.Dense(64, activation="gelu")
-        self.dominance_hidden = tf.keras.layers.Dense(64, activation="gelu")
+        self.category_hidden = tf.keras.layers.Dense(128, activation="gelu")
+        self.valence_hidden = tf.keras.layers.Dense(128, activation="gelu")
+        self.arousal_hidden = tf.keras.layers.Dense(128, activation="gelu")
+        self.dominance_hidden = tf.keras.layers.Dense(128, activation="gelu")
+        self.gender_hidden = tf.keras.layers.Dense(128, activation="gelu")
+        self.age_hidden = tf.keras.layers.Dense(128, activation="gelu")
         
-        self.category_head = tf.keras.layers.Dense(8)
-        self.satisfaction_head = tf.keras.layers.Dense(1)
-        self.calmness_head = tf.keras.layers.Dense(1)
+        
+        self.category_head = tf.keras.layers.Dense(26)
         self.valence_head = tf.keras.layers.Dense(1)
         self.arousal_head = tf.keras.layers.Dense(1)
         self.dominance_head = tf.keras.layers.Dense(1)
+        self.gender_head = tf.keras.layers.Dense(1)
+        self.age_head = tf.keras.layers.Dense(3)
 
     def call(self, x, training=False):
         x = self.rescale(x)
@@ -118,28 +119,29 @@ class AffectAnalysisCNN(tf.keras.Model):
         vector = self.linear2(vector)
         
         vector = self.dropout(vector, training=training)
+
+        category = self.category_hidden(vector)
+        valence = self.valence_hidden(vector)
+        arousal = self.arousal_hidden(vector)
+        dominance = self.dominance_hidden(vector)
+        gender = self.gender_hidden(vector)
+        age = self.age_hidden(vector)
         
-        cat_hidden = self.category_hidden(vector)
-        sat_hidden = self.satisfaction_hidden(vector)
-        cal_hidden = self.calmness_hidden(vector)
-        val_hidden = self.valence_hidden(vector)
-        arl_hidden = self.arousal_hidden(vector)
-        dom_hidden = self.dominance_hidden(vector)
         
-        cat_head = self.category_head(cat_hidden)
-        sat_head = self.satisfaction_head(sat_hidden)
-        cal_head = self.calmness_head(cal_hidden)
-        val_head = self.valence_head(val_hidden)
-        arl_head = self.arousal_head(arl_hidden)
-        dom_head = self.dominance_head(dom_hidden)
+        category = self.category_head(category)
+        valence = self.valence_head(valence)
+        arousal = self.arousal_head(arousal)
+        dominance = self.dominance_head(dominance)
+        gender = self.gender_head(gender)
+        age = self.age_head(age)
         
         out = {
-            "category": cat_head,
-            "satisfaction": sat_head,
-            "calmness": cal_head,
-            "valence": val_head,
-            "arousal": arl_head,
-            "dominance": dom_head
+            "category": category,
+            "valence": valence,
+            "arousal": arousal,
+            "dominance": dominance,
+            "gender": gender,
+            "age": age
         }
         
         return out

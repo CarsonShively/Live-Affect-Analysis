@@ -3,7 +3,7 @@ os.environ["MPLBACKEND"] = "Agg"
 import tensorflow as tf
 from pathlib import Path
 import numpy as np
-from live_affect_analysis.low_latency_model import LowLatencyModel
+from live_affect_analysis.affect_analysis_cnn import AffectAnalysisCNN
 from huggingface_hub import get_token, HfApi
 import shutil
 
@@ -59,9 +59,9 @@ def train_model():
     print(f"train images shape: {train_images_tensor.shape}")
     print(f"val images shape: {val_images_tensor.shape}")
     
-    model = LowLatencyModel()
+    model = AffectAnalysisCNN()
     
-    optimizer = tf.keras.optimizers.AdamW(learning_rate=3e-4, weight_decay=1e-5)
+    optimizer = tf.keras.optimizers.AdamW(learning_rate=3e-4, weight_decay=1e-4)
     
     losses = {
         "category": tf.keras.losses.BinaryCrossentropy(from_logits=True),
@@ -81,7 +81,7 @@ def train_model():
      
     early_stopping = tf.keras.callbacks.EarlyStopping(
         monitor="val_loss",
-        patience=50,
+        patience=10,
         restore_best_weights=True
     )
     
@@ -99,15 +99,15 @@ def train_model():
         shutil.rmtree(model_out)
     model_out.mkdir(parents=True, exist_ok=True)    
     
-    model.save_weights(model_out / "low_latency_model.weights.h5")
+    model.save_weights(model_out / "affect_analysis_model.weights.h5")
     
     if get_token() != None:
         api = HfApi()
         api.upload_file(
             repo_id="Carson-Shively/Affect-Analysis",
             repo_type="model",
-            path_or_fileobj=model_out / "low_latency_model.weights.h5",
-            path_in_repo="low_latency_model.weights.h5"
+            path_or_fileobj=model_out / "affect_analysis_model.weights.h5",
+            path_in_repo="affect_analysis_model.weights.h5"
         )
     
 if __name__ == "__main__":
