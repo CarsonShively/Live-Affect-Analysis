@@ -31,7 +31,7 @@ def evaluate():
     model_weights_path = Path(snapshot_download(
         repo_id="Carson-Shively/Affect-Analysis",
         repo_type="model",
-        allow_patterns="gated_feature_fusion.weights.h5"
+        allow_patterns="low_latency_model.weights.h5"
     ))
     
     model = LowLatencyModel()
