@@ -4,7 +4,7 @@ os.environ["MPLBACKEND"] = "Agg"
 import tensorflow as tf
 import numpy as np
 from huggingface_hub import snapshot_download, get_token, HfApi
-from live_affect_analysis.gated_feature_fusion import GatedFeatureFusion
+from live_affect_analysis.low_latency_model import LowLatencyModel
 import json
 
 def evaluate():
@@ -34,13 +34,13 @@ def evaluate():
         allow_patterns="gated_feature_fusion.weights.h5"
     ))
     
-    model = GatedFeatureFusion()
+    model = LowLatencyModel()
     
     dummy_input = tf.zeros(shape=(1, 224, 224, 3))
     
     model(dummy_input)
     
-    model.load_weights(model_weights_path / "gated_feature_fusion.weights.h5")
+    model.load_weights(model_weights_path / "low_latency_model.weights.h5")
     
     losses = {
         "category": tf.keras.losses.BinaryCrossentropy(from_logits=True),

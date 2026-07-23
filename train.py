@@ -3,7 +3,7 @@ os.environ["MPLBACKEND"] = "Agg"
 import tensorflow as tf
 from pathlib import Path
 import numpy as np
-from live_affect_analysis.gated_feature_fusion import GatedFeatureFusion
+from live_affect_analysis.low_latency_model import LowLatencyModel
 from huggingface_hub import get_token, HfApi
 import shutil
 
@@ -59,9 +59,9 @@ def train_model():
     print(f"train images shape: {train_images_tensor.shape}")
     print(f"val images shape: {val_images_tensor.shape}")
     
-    model = GatedFeatureFusion()
+    model = LowLatencyModel()
     
-    optimizer = tf.keras.optimizers.AdamW(learning_rate=4e-4, weight_decay=5e-4)
+    optimizer = tf.keras.optimizers.AdamW(learning_rate=1e-4, weight_decay=5e-4, global_clipnorm=1.0)
     
     losses = {
         "category": tf.keras.losses.BinaryCrossentropy(from_logits=True),
@@ -81,7 +81,7 @@ def train_model():
      
     early_stopping = tf.keras.callbacks.EarlyStopping(
         monitor="val_loss",
-        patience=10,
+        patience=8,
         restore_best_weights=True
     )
     
@@ -89,8 +89,8 @@ def train_model():
         train_images_tensor,
         train_labels_tensors,
         validation_data=(val_images_tensor, val_labels_tensors),
-        batch_size=32,
-        epochs=100,
+        batch_size=16,
+        epochs=50,
         callbacks=[early_stopping]
     )
     
@@ -99,15 +99,15 @@ def train_model():
         shutil.rmtree(model_out)
     model_out.mkdir(parents=True, exist_ok=True)    
     
-    model.save_weights(model_out / "gated_feature_fusion.weights.h5")
+    model.save_weights(model_out / "low_latency_model.weights.h5")
     
     if get_token() != None:
         api = HfApi()
         api.upload_file(
             repo_id="Carson-Shively/Affect-Analysis",
             repo_type="model",
-            path_or_fileobj=model_out / "gated_feature_fusion.weights.h5",
-            path_in_repo="gated_feature_fusion.weights.h5"
+            path_or_fileobj=model_out / "low_latency_model.weights.h5",
+            path_in_repo="low_latency_model.weights.h5"
         )
     
 if __name__ == "__main__":
