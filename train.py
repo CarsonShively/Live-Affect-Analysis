@@ -61,7 +61,7 @@ def train_model():
     
     model = LowLatencyModel()
     
-    optimizer = tf.keras.optimizers.AdamW(learning_rate=1e-4, weight_decay=1e-4)
+    optimizer = tf.keras.optimizers.AdamW(learning_rate=1e-4, weight_decay=1e-4, global_clipnorm=1.0)
     
     losses = {
         "category": tf.keras.losses.BinaryCrossentropy(from_logits=True),
@@ -98,7 +98,7 @@ def train_model():
         train_images_tensor,
         train_labels_tensors,
         validation_data=(val_images_tensor, val_labels_tensors),
-        batch_size=32,
+        batch_size=64,
         epochs=50,
         callbacks=[early_stopping]
     )
