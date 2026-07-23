@@ -13,8 +13,9 @@ class LowLatencyModel(tf.keras.Model):
         self.backbone.trainable = False
         
         self.dropout = tf.keras.layers.Dropout(0.20)
+        self.spatial_dropout = tf.keras.layers.SpatialDropout2D(0.15)
         
-        self.category_projection = tf.keras.layers.Conv2D(filters=64, kernel_size=1, padding="same", use_bias=False)
+        self.category_projection = tf.keras.layers.Conv2D(filters=128, kernel_size=1, padding="same", use_bias=False)
         self.category_projection_norm = tf.keras.layers.GroupNormalization(groups=8)
         self.category_spatial = tf.keras.layers.DepthwiseConv2D(kernel_size=3, padding="same", use_bias=False)
         self.category_spatial_norm = tf.keras.layers.GroupNormalization(groups=8)
@@ -34,23 +35,23 @@ class LowLatencyModel(tf.keras.Model):
         self.dominance_spatial = tf.keras.layers.DepthwiseConv2D(kernel_size=3, padding="same", use_bias=False)
         self.dominance_spatial_norm = tf.keras.layers.GroupNormalization(groups=8)
         
-        self.gender_projection = tf.keras.layers.Conv2D(filters=64, kernel_size=1, padding="same", use_bias=False)
+        self.gender_projection = tf.keras.layers.Conv2D(filters=32, kernel_size=1, padding="same", use_bias=False)
         self.gender_projection_norm = tf.keras.layers.GroupNormalization(groups=8)
         self.gender_spatial = tf.keras.layers.DepthwiseConv2D(kernel_size=3, padding="same", use_bias=False)
         self.gender_spatial_norm = tf.keras.layers.GroupNormalization(groups=8)
         
-        self.age_projection = tf.keras.layers.Conv2D(filters=64, kernel_size=1, padding="same", use_bias=False)
+        self.age_projection = tf.keras.layers.Conv2D(filters=128, kernel_size=1, padding="same", use_bias=False)
         self.age_projection_norm = tf.keras.layers.GroupNormalization(groups=8)
         self.age_spatial = tf.keras.layers.DepthwiseConv2D(kernel_size=3, padding="same", use_bias=False)
         self.age_spatial_norm = tf.keras.layers.GroupNormalization(groups=8)
         
         self.pool = tf.keras.layers.GlobalAveragePooling2D()
         
-        self.category_hidden = tf.keras.layers.Dense(128)
+        self.category_hidden = tf.keras.layers.Dense(256)
         self.valence_hidden = tf.keras.layers.Dense(128)
         self.arousal_hidden = tf.keras.layers.Dense(128)
         self.dominance_hidden = tf.keras.layers.Dense(128)
-        self.gender_hidden = tf.keras.layers.Dense(128)
+        self.gender_hidden = tf.keras.layers.Dense(64)
         self.age_hidden = tf.keras.layers.Dense(128)
         
         self.category_norm = tf.keras.layers.LayerNormalization()
@@ -61,11 +62,11 @@ class LowLatencyModel(tf.keras.Model):
         self.age_norm = tf.keras.layers.LayerNormalization()
         
         
-        self.category_hidden2 = tf.keras.layers.Dense(64)
+        self.category_hidden2 = tf.keras.layers.Dense(128)
         self.valence_hidden2 = tf.keras.layers.Dense(64)
         self.arousal_hidden2 = tf.keras.layers.Dense(64)
         self.dominance_hidden2 = tf.keras.layers.Dense(64)
-        self.gender_hidden2 = tf.keras.layers.Dense(64)
+        self.gender_hidden2 = tf.keras.layers.Dense(32)
         self.age_hidden2 = tf.keras.layers.Dense(64)
         
         self.category_norm2 = tf.keras.layers.LayerNormalization()
@@ -92,6 +93,7 @@ class LowLatencyModel(tf.keras.Model):
         category = self.category_spatial(category)
         category = self.category_spatial_norm(category)
         category = tf.keras.activations.gelu(category)
+        category = self.spatial_dropout(category)
         
         valence = self.valence_projection(feature_map)
         valence = self.valence_projection_norm(valence)

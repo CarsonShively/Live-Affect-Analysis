@@ -61,7 +61,7 @@ def train_model():
     
     model = LowLatencyModel()
     
-    optimizer = tf.keras.optimizers.AdamW(learning_rate=1e-4, weight_decay=5e-4, global_clipnorm=1.0)
+    optimizer = tf.keras.optimizers.AdamW(learning_rate=1e-4, weight_decay=1e-4, global_clipnorm=1.0)
     
     losses = {
         "category": tf.keras.losses.BinaryCrossentropy(from_logits=True),
@@ -72,16 +72,25 @@ def train_model():
         "age": tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
     }
     
+    loss_weights = {
+        "category": 1.5,
+        "valence": 1.0,
+        "arousal": 1.0,
+        "dominance": 1.0,
+        "gender": 0.75,
+        "age": 1
+    }
     
     model.compile(
         optimizer=optimizer,
         loss=losses,
-        jit_compile=False
+        jit_compile=False,
+        loss_weights=loss_weights
     )
      
     early_stopping = tf.keras.callbacks.EarlyStopping(
         monitor="val_loss",
-        patience=8,
+        patience=10,
         restore_best_weights=True
     )
     
@@ -89,7 +98,7 @@ def train_model():
         train_images_tensor,
         train_labels_tensors,
         validation_data=(val_images_tensor, val_labels_tensors),
-        batch_size=16,
+        batch_size=32,
         epochs=50,
         callbacks=[early_stopping]
     )
