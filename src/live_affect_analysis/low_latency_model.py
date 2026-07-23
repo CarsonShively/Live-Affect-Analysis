@@ -21,23 +21,6 @@ class LowLatencyModel(tf.keras.Model):
         self.gender_hidden = tf.keras.layers.Dense(128, activation="gelu")
         self.age_hidden = tf.keras.layers.Dense(128, activation="gelu")
         
-        
-        self.category_hidden2 = tf.keras.layers.Dense(64, activation="gelu")
-        self.valence_hidden2 = tf.keras.layers.Dense(64, activation="gelu")
-        self.arousal_hidden2 = tf.keras.layers.Dense(64, activation="gelu")
-        self.dominance_hidden2 = tf.keras.layers.Dense(64, activation="gelu")
-        self.gender_hidden2 = tf.keras.layers.Dense(64, activation="gelu")
-        self.age_hidden2 = tf.keras.layers.Dense(64, activation="gelu")
-    
-        
-        self.category_hidden3 = tf.keras.layers.Dense(32, activation="gelu")
-        self.valence_hidden3 = tf.keras.layers.Dense(32, activation="gelu")
-        self.arousal_hidden3 = tf.keras.layers.Dense(32, activation="gelu")
-        self.dominance_hidden3 = tf.keras.layers.Dense(32, activation="gelu")
-        self.gender_hidden3 = tf.keras.layers.Dense(32, activation="gelu")
-        self.age_hidden3 = tf.keras.layers.Dense(32, activation="gelu")
-        
-        
         self.category_head = tf.keras.layers.Dense(26)
         self.valence_head = tf.keras.layers.Dense(1)
         self.arousal_head = tf.keras.layers.Dense(1)
@@ -63,35 +46,6 @@ class LowLatencyModel(tf.keras.Model):
         dominance = self.dropout(dominance, training=training)
         gender = self.dropout(gender, training=training)
         age = self.dropout(age, training=training)
-        
-        category = self.category_hidden2(category)
-        valence = self.valence_hidden2(valence)
-        arousal = self.arousal_hidden2(arousal)
-        dominance = self.dominance_hidden2(dominance)
-        gender = self.gender_hidden2(gender)
-        age = self.age_hidden2(age)
-        
-        category = self.dropout(category, training=training)
-        valence = self.dropout(valence, training=training)
-        arousal = self.dropout(arousal, training=training)
-        dominance = self.dropout(dominance, training=training)
-        gender = self.dropout(gender, training=training)
-        age = self.dropout(age, training=training)
-
-        category = self.category_hidden3(category)
-        valence = self.valence_hidden3(valence)
-        arousal = self.arousal_hidden3(arousal)
-        dominance = self.dominance_hidden3(dominance)
-        gender = self.gender_hidden3(gender)
-        age = self.age_hidden3(age)
-        
-        category = self.dropout(category, training=training)
-        valence = self.dropout(valence, training=training)
-        arousal = self.dropout(arousal, training=training)
-        dominance = self.dropout(dominance, training=training)
-        gender = self.dropout(gender, training=training)
-        age = self.dropout(age, training=training)
-        
         
         category = self.category_head(category)
         valence = self.valence_head(valence)
