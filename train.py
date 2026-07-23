@@ -61,7 +61,7 @@ def train_model():
     
     model = LowLatencyModel()
     
-    optimizer = tf.keras.optimizers.AdamW(learning_rate=1e-4, weight_decay=1e-4)
+    optimizer = tf.keras.optimizers.AdamW(learning_rate=3e-4, weight_decay=1e-5)
     
     losses = {
         "category": tf.keras.losses.BinaryCrossentropy(from_logits=True),
@@ -81,7 +81,7 @@ def train_model():
      
     early_stopping = tf.keras.callbacks.EarlyStopping(
         monitor="val_loss",
-        patience=10,
+        patience=50,
         restore_best_weights=True
     )
     
