@@ -61,7 +61,7 @@ def train_model():
     
     model = LowLatencyModel()
     
-    optimizer = tf.keras.optimizers.AdamW(learning_rate=2e-4, weight_decay=3e-4)
+    optimizer = tf.keras.optimizers.AdamW(learning_rate=1e-4, weight_decay=1e-4)
     
     losses = {
         "category": tf.keras.losses.BinaryCrossentropy(from_logits=True),
@@ -74,11 +74,11 @@ def train_model():
     
     loss_weights = {
         "category": 1.5,
-        "valence": 1.5,
-        "arousal": 1.5,
-        "dominance": 1.5,
+        "valence": 1.0,
+        "arousal": 1.0,
+        "dominance": 1.0,
         "gender": 0.5,
-        "age": 1
+        "age": 0.5
     }
     
     model.compile(
