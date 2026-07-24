@@ -22,7 +22,17 @@ class LowLatencyModel(tf.keras.Model):
         self.valence_head = tf.keras.layers.Dense(1)
         self.arousal_head = tf.keras.layers.Dense(1)
         
+        self.augmentation = tf.keras.Sequential([
+            tf.keras.layers.RandomFlip("horizontal"),
+            tf.keras.layers.RandomRotation(0.03),
+            tf.keras.layers.RandomZoom(0.1),
+            tf.keras.layers.RandomTranslation(0.05, 0.05),
+            tf.keras.layers.RandomContrast(0.1)
+        ])
+        
     def call(self, x, training=False):
+        
+        x = self.augmentation(x, training=training)
         
         feature_vector = self.backbone(x, training=False)
         feature_vector = self.dropout(feature_vector)

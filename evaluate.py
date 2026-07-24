@@ -21,11 +21,8 @@ def evaluate():
     
     test_labels_tensors = {
         "category": tf.convert_to_tensor(test_labels[:, :26], dtype=tf.float32),
-        "valence": tf.convert_to_tensor(test_labels[:, 26:27], dtype=tf.float32),
-        "arousal": tf.convert_to_tensor(test_labels[:, 27:28], dtype=tf.float32),
-        "dominance": tf.convert_to_tensor(test_labels[:, 28:29], dtype=tf.float32),
-        "gender": tf.convert_to_tensor(test_labels[:, 29:30], dtype=tf.float32),
-        "age": tf.convert_to_tensor(test_labels[:, 30], dtype=tf.int32)
+        "valence": tf.convert_to_tensor((test_labels[:, 26:27]-1)/9, dtype=tf.float32),
+        "arousal": tf.convert_to_tensor((test_labels[:, 27:28]-1)/9, dtype=tf.float32)
     }
     
     model_weights_path = Path(snapshot_download(
@@ -45,10 +42,7 @@ def evaluate():
     losses = {
         "category": tf.keras.losses.BinaryCrossentropy(from_logits=True),
         "valence": tf.keras.losses.MeanSquaredError(),
-        "arousal": tf.keras.losses.MeanSquaredError(),
-        "dominance": tf.keras.losses.MeanSquaredError(),
-        "gender": tf.keras.losses.BinaryCrossentropy(from_logits=True),
-        "age": tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        "arousal": tf.keras.losses.MeanSquaredError()
     }
     
     
@@ -60,7 +54,7 @@ def evaluate():
     out = model.evaluate(
         test_images_tensor,
         test_labels_tensors,
-        batch_size=32,
+        batch_size=16,
         return_dict=True
     )
     
