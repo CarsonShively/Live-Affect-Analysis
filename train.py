@@ -58,7 +58,7 @@ def train_model():
     
     model = LowLatencyModel()
     
-    optimizer = tf.keras.optimizers.AdamW(learning_rate=3e-4, weight_decay=1e-4)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4)
     
     losses = {
         "category": tf.keras.losses.BinaryCrossentropy(from_logits=True),
