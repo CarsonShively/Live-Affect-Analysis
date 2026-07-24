@@ -39,17 +39,17 @@ def train_model():
     val_labels_valence = (val_labels[:, 26:27] - 1.0) / 9.0
     val_labels_arousal = (val_labels[:, 27:28] - 1.0) / 9.0
     
-    train_happiness = train_labels[:, 5]
-    train_calmness = train_labels[:, 9]
-    train_sadness = train_labels[:, 12]
-    train_fear = train_labels[:, 16]
-    train_anger = train_labels[:, 22]
+    train_happiness = train_labels[:, 5:6]
+    train_calmness = train_labels[:, 9:10]
+    train_sadness = train_labels[:, 12:13]
+    train_fear = train_labels[:, 16:17]
+    train_anger = train_labels[:, 22:23]
     
-    val_happiness = train_labels[:, 5]
-    val_calmness = train_labels[:, 9]
-    val_sadness = train_labels[:, 12]
-    val_fear = train_labels[:, 16]
-    val_anger = train_labels[:, 22]
+    val_happiness = val_labels[:, 5:6]
+    val_calmness = val_labels[:, 9:10]
+    val_sadness = val_labels[:, 12:13]
+    val_fear = val_labels[:, 16:17]
+    val_anger = val_labels[:, 22:23]
     
     train_labels_tensors = {
         "happiness": tf.convert_to_tensor(train_happiness, dtype=tf.float32),
@@ -92,8 +92,8 @@ def train_model():
     
     loss_weights = {
         "happiness": 1.0,
+        "calmness": 1.0,
         "sadness": 1.0,
-        "distress": 1.0,
         "fear": 1.0,
         "anger": 1.0,
         "valence": 10.0,
