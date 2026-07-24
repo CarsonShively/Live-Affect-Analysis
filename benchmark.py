@@ -13,12 +13,12 @@ def benchmark():
 
     
     train_category = tf.convert_to_tensor(train_labels[:, :26], dtype=tf.float32)
-    train_valence = tf.convert_to_tensor(train_labels[:, 26:27], dtype=tf.float32)
-    train_arousal = tf.convert_to_tensor(train_labels[:, 27:28], dtype=tf.float32)
+    train_valence = tf.convert_to_tensor((train_labels[:, 26:27] - 1) / 9, dtype=tf.float32)
+    train_arousal = tf.convert_to_tensor((train_labels[:, 27:28] - 1) / 9, dtype=tf.float32)
 
     val_category = tf.convert_to_tensor(val_labels[:, :26], dtype=tf.float32)
-    val_valence = tf.convert_to_tensor(val_labels[:, 26:27], dtype=tf.float32)
-    val_arousal = tf.convert_to_tensor(val_labels[:, 27:28], dtype=tf.float32)
+    val_valence = tf.convert_to_tensor((val_labels[:, 26:27] - 1) / 9, dtype=tf.float32)
+    val_arousal = tf.convert_to_tensor((val_labels[:, 27:28] - 1) / 9, dtype=tf.float32)
 
     category_probabilities = tf.reduce_mean(train_category, axis=0)
     mean_categories = tf.broadcast_to(category_probabilities, val_category.shape)
