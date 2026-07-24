@@ -35,7 +35,6 @@ class LowLatencyModel(tf.keras.Model):
         x = self.augmentation(x, training=training)
         
         feature_vector = self.backbone(x, training=False)
-        feature_vector = self.dropout(feature_vector)
         
         category = self.category_hidden(feature_vector)
         valence = self.valence_hidden(feature_vector)
