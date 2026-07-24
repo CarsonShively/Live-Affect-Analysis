@@ -34,24 +34,21 @@ def train_model():
     print(f"val images shape: {val_images_tensor.shape}")
     print(f"val labels shape: {val_labels.shape}")
     
-    
+    train_labels[:, 26:27] = (train_labels[:, 26:27] - 1.0) / 9.0
+    train_labels[:, 27:28] = (train_labels[:, 27:28] - 1.0) / 9.0
+    val_labels[:, 26:27] = (val_labels[:, 26:27] - 1.0) / 9.0
+    val_labels[:, 27:28] = (val_labels[:, 27:28] - 1.0) / 9.0
     
     train_labels_tensors = {
         "category": tf.convert_to_tensor(train_labels[:, :26], dtype=tf.float32),
         "valence": tf.convert_to_tensor(train_labels[:, 26:27], dtype=tf.float32),
-        "arousal": tf.convert_to_tensor(train_labels[:, 27:28], dtype=tf.float32),
-        "dominance": tf.convert_to_tensor(train_labels[:, 28:29], dtype=tf.float32),
-        "gender": tf.convert_to_tensor(train_labels[:, 29:30], dtype=tf.float32),
-        "age": tf.convert_to_tensor(train_labels[:, 30], dtype=tf.int32)
+        "arousal": tf.convert_to_tensor(train_labels[:, 27:28], dtype=tf.float32)
     }
     
     val_labels_tensors = {
         "category": tf.convert_to_tensor(val_labels[:, :26], dtype=tf.float32),
         "valence": tf.convert_to_tensor(val_labels[:, 26:27], dtype=tf.float32),
-        "arousal": tf.convert_to_tensor(val_labels[:, 27:28], dtype=tf.float32),
-        "dominance": tf.convert_to_tensor(val_labels[:, 28:29], dtype=tf.float32),
-        "gender": tf.convert_to_tensor(val_labels[:, 29:30], dtype=tf.float32),
-        "age": tf.convert_to_tensor(val_labels[:, 30], dtype=tf.int32)
+        "arousal": tf.convert_to_tensor(val_labels[:, 27:28], dtype=tf.float32)
     }
     
     del train_labels, val_labels
@@ -66,10 +63,7 @@ def train_model():
     losses = {
         "category": tf.keras.losses.BinaryCrossentropy(from_logits=True),
         "valence": tf.keras.losses.MeanSquaredError(),
-        "arousal": tf.keras.losses.MeanSquaredError(),
-        "dominance": tf.keras.losses.MeanSquaredError(),
-        "gender": tf.keras.losses.BinaryCrossentropy(from_logits=True),
-        "age": tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        "arousal": tf.keras.losses.MeanSquaredError()
     }
     
     

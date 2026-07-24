@@ -17,16 +17,10 @@ class LowLatencyModel(tf.keras.Model):
         self.category_hidden = tf.keras.layers.Dense(128, activation="gelu")
         self.valence_hidden = tf.keras.layers.Dense(128, activation="gelu")
         self.arousal_hidden = tf.keras.layers.Dense(128, activation="gelu")
-        self.dominance_hidden = tf.keras.layers.Dense(128, activation="gelu")
-        self.gender_hidden = tf.keras.layers.Dense(128, activation="gelu")
-        self.age_hidden = tf.keras.layers.Dense(128, activation="gelu")
         
         self.category_head = tf.keras.layers.Dense(26)
         self.valence_head = tf.keras.layers.Dense(1)
         self.arousal_head = tf.keras.layers.Dense(1)
-        self.dominance_head = tf.keras.layers.Dense(1)
-        self.gender_head = tf.keras.layers.Dense(1)
-        self.age_head = tf.keras.layers.Dense(3)
         
     def call(self, x, training=False):
         
@@ -36,31 +30,19 @@ class LowLatencyModel(tf.keras.Model):
         category = self.category_hidden(feature_vector)
         valence = self.valence_hidden(feature_vector)
         arousal = self.arousal_hidden(feature_vector)
-        dominance = self.dominance_hidden(feature_vector)
-        gender = self.gender_hidden(feature_vector)
-        age = self.age_hidden(feature_vector)
         
         category = self.dropout(category, training=training)
         valence = self.dropout(valence, training=training)
         arousal = self.dropout(arousal, training=training)
-        dominance = self.dropout(dominance, training=training)
-        gender = self.dropout(gender, training=training)
-        age = self.dropout(age, training=training)
         
         category = self.category_head(category)
         valence = self.valence_head(valence)
         arousal = self.arousal_head(arousal)
-        dominance = self.dominance_head(dominance)
-        gender = self.gender_head(gender)
-        age = self.age_head(age)
         
         out = {
             "category": category,
             "valence": valence,
-            "arousal": arousal,
-            "dominance": dominance,
-            "gender": gender,
-            "age": age
+            "arousal": arousal
         }
         
         return out
