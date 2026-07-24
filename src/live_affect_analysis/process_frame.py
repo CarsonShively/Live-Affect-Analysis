@@ -2,7 +2,7 @@ import threading
 import av
 from ultralytics import YOLO
 import tensorflow as tf
-from live_affect_analysis.gated_feature_fusion import GatedFeatureFusion
+from live_affect_analysis.low_latency_model import LowLatencyModel
 import cv2
 import json
 from huggingface_hub import snapshot_download
@@ -10,32 +10,31 @@ from pathlib import Path
 
 class ProcessFrame():
     def __init__(self):
-        self.prediction = None
         self.detector = YOLO("yolo26n.pt")
         
         model_folder = Path(snapshot_download(
             repo_id="Carson-Shively/Affect-Analysis",
             repo_type="model",
-            allow_patterns=["category_dictionary.json", "gated_feature_fusion.weights.h5"]
+            allow_patterns=["category_dictionary.json", "low_latency_model.weights.h5"]
         ))
         
         with open(model_folder / "category_dictionary.json", "r") as con:
             dictionary = json.load(con)
         self.dictionary_list = list(dictionary.keys())
         
-        self.model = GatedFeatureFusion()
+        self.model = LowLatencyModel()
         dummy_input = tf.zeros(shape=[1, 224, 224, 3])
         self.model(x=dummy_input)
-        self.model.load_weights(model_folder / "gated_feature_fusion.weights.h5")
+        self.model.load_weights(model_folder / "low_latency_model.weights.h5")
 
     
     def detect_person(self, image):
-        result = self.detector(source=image, classes=[0], conf=0.4, verbse=False, imgsz=320)
+        result = self.detector(source=image, classes=[0], conf=0.4, verbose=False, imgsz=320)
         result = result[0]
         largest_box = 0.0
         largest_coords = None
         
-        if len(result.boxes == 0):
+        if result.boxes == 0:
             return None
         
         for box in result.boxes:
@@ -56,7 +55,8 @@ class ProcessFrame():
                     "status": "No Person Detected"
                 }
                 
-                self.prediction = output
+                
+                return output
                 
             else:
                 x1, y1, x2, y2 = cords
@@ -68,46 +68,32 @@ class ProcessFrame():
                         target_height=224,
                         target_width=224
                     )
+                image = image[tf.newaxis, ...]
                 output_dict = self.model(image)
-                category_probabilites = tf.nn.sigmoid(output_dict["category"])
-                
-                top_values, top_indices = tf.math.top_k(category_probabilites, k=3)
-                
-                if output_dict["gender"] >= 0.5:
-                    gender = "Male"
-                else:
-                    gender = "Female"
-                
-                age_index = tf.argmax(output_dict["age"], axis=-1)
-                
-                if age_index == 0:
-                    age = "Kid"
-                elif age_index == 1:
-                    age = "Teenager"
-                else:
-                    age = "Adult"
+                happiness = tf.sigmoid(output_dict["happiness"])
+                calmness = tf.sigmoid(output_dict["calmness"])
+                sadness = tf.sigmoid(output_dict["sadness"])
+                fear = tf.sigmoid(output_dict["fear"])
+                anger = tf.sigmoid(output_dict["anger"])
+                valence = output_dict["valence"] * 9 + 1
+                arousal = output_dict["arousal"] * 9 + 1
                 
                 output = {
+                    "success": True,
                     "status": "Person Detected",
-                    "age": age,
-                    "gender": gender,
-                    "mood": int(round(output_dict["valence"])),
-                    "energy": int(round(output_dict["arousal"])),
-                    "assertiveness": int(round(output_dict["dominance"])),
-                    "category_1_label": self.dictionary_list[top_indices[0]],
-                    "category_1_scores": float(top_values[0]),
-                    "category_2_label": self.dictionary_list[top_indices[1]],
-                    "category_2_scores": float(top_values[1]),
-                    "category_3_label": self.dictionary_list[top_indices[2]],
-                    "category_3_scores": float(top_values[2]),
+                    "mood": int(round(valence.numpy().item())),
+                    "energy": int(round(arousal.numpy().item())),
+                    "happiness": round(happiness.numpy().item() * 100, 2),
+                    "calmness": round(calmness.numpy().item() * 100, 2),
+                    "sadness": round(sadness.numpy().item() * 100, 2),
+                    "fear": round(fear.numpy().item() * 100, 2),
+                    "anger": round(anger.numpy().item() * 100, 2),
                 }
                 
-                self.prediction = output
+                
+                return output
             
         except Exception as error:
             print(f"Inference failed: {error}")
-        finally:
-            with self.lock():
-                self.inferencing = False
                     
                     

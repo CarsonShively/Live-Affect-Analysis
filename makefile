@@ -11,7 +11,7 @@ HF := $(VENV)/bin/hf
 
 STAMP := $(VENV)/installed
 
-ST := $(VENV)/bin/streamlit
+UC := $(VENV)/bin/uvicorn
 
 $(PY):
 	python3 -m venv $(VENV) 
@@ -30,10 +30,7 @@ $(STAMP): $(ROOT)uv.lock $(UV)
 install: $(STAMP)
 
 demo: $(STAMP)
-	cd $(ROOT) && $(ST) run demo.py --server.fileWatcherType none
+	cd $(ROOT) && $(UC) demo_app.app:app --host 0.0.0.0 --port 8000
 
-labels_eda: $(STAMP)
-	cd $(ROOT) && $(PY) labels_eda.py 
-
-process_images: $(STAMP)
-	cd $(ROOT) && $(PY) process_images.py 
+cloudflare-tunnel: 
+	cloudflared tunnel --url http://localhost:8000
