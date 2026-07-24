@@ -43,7 +43,7 @@ def benchmark():
     val_loss = mse(val_valence, mean_val)
     ar_loss = mse(val_arousal, mean_ar)
     
-    loss = cat_loss + val_loss + ar_loss
+    loss = cat_loss + val_loss * 10.0 + ar_loss * 10.0
     
     report = {
         "total_loss": loss.numpy().item(),

@@ -66,11 +66,17 @@ def train_model():
         "arousal": tf.keras.losses.MeanSquaredError()
     }
     
+    loss_weights = {
+        "category": 1.0,
+        "valence": 10.0,
+        "arousal": 10.0
+    }
     
     model.compile(
         optimizer=optimizer,
         loss=losses,
-        jit_compile=False
+        jit_compile=False,
+        loss_weights=loss_weights
     )
      
     early_stopping = tf.keras.callbacks.EarlyStopping(
