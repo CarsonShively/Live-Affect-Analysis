@@ -14,11 +14,24 @@ class LowLatencyModel(tf.keras.Model):
         
         self.dropout = tf.keras.layers.Dropout(0.15)
         
-        self.category_hidden = tf.keras.layers.Dense(128, activation="gelu")
+        self.confusion_hidden = tf.keras.layers.Dense(128, activation="gelu")
+        self.happiness_hidden = tf.keras.layers.Dense(128, activation="gelu")
+        self.confidence_hidden = tf.keras.layers.Dense(128, activation="gelu")
+        self.calmness_hidden = tf.keras.layers.Dense(128, activation="gelu")
+        self.distress_hidden = tf.keras.layers.Dense(128, activation="gelu")
+        self.fear_hidden = tf.keras.layers.Dense(128, activation="gelu")
+        self.anger_hidden = tf.keras.layers.Dense(128, activation="gelu")
         self.valence_hidden = tf.keras.layers.Dense(128, activation="gelu")
         self.arousal_hidden = tf.keras.layers.Dense(128, activation="gelu")
         
-        self.category_head = tf.keras.layers.Dense(26)
+        
+        self.confusion_head = tf.keras.layers.Dense(1)
+        self.happiness_head = tf.keras.layers.Dense(1)
+        self.confidence_head = tf.keras.layers.Dense(1)
+        self.calmness_head = tf.keras.layers.Dense(1)
+        self.distress_head = tf.keras.layers.Dense(1)
+        self.fear_head = tf.keras.layers.Dense(1)
+        self.anger_head = tf.keras.layers.Dense(1)
         self.valence_head = tf.keras.layers.Dense(1)
         self.arousal_head = tf.keras.layers.Dense(1)
         
@@ -36,20 +49,45 @@ class LowLatencyModel(tf.keras.Model):
         
         feature_vector = self.backbone(x, training=False)
         
-        category = self.category_hidden(feature_vector)
+        confusion = self.confusion_hidden(feature_vector)
+        happiness = self.happiness_hidden(feature_vector)
+        confidence = self.confidence_hidden(feature_vector)
+        calmness = self.calmness_hidden(feature_vector)
+        distress = self.distress_hidden(feature_vector)
+        fear = self.fear_hidden(feature_vector)
+        anger = self.anger_hidden(feature_vector)
         valence = self.valence_hidden(feature_vector)
         arousal = self.arousal_hidden(feature_vector)
         
-        category = self.dropout(category, training=training)
+        confusion = self.dropout(confusion, training=training)
+        happiness = self.dropout(happiness, training=training)
+        confidence = self.dropout(confidence, training=training)
+        calmness = self.dropout(calmness, training=training)
+        distress = self.dropout(distress, training=training)
+        fear = self.dropout(fear, training=training)
+        anger = self.dropout(anger, training=training)
         valence = self.dropout(valence, training=training)
         arousal = self.dropout(arousal, training=training)
         
-        category = self.category_head(category)
+        confusion = self.confusion_head(confusion)
+        happiness = self.happiness_head(happiness)
+        confidence = self.confidence_head(confidence)
+        calmness = self.calmness_head(calmness)
+        distress = self.distress_head(distress)
+        fear = self.fear_head(fear)
+        anger = self.anger_head(anger)
         valence = self.valence_head(valence)
         arousal = self.arousal_head(arousal)
         
         out = {
-            "category": category,
+            
+            "confusion": confusion,
+            "happiness": happiness,
+            "confidence": confidence,
+            "calmness": calmness,
+            "distress": distress,
+            "fear": fear,
+            "anger": anger,
             "valence": valence,
             "arousal": arousal
         }
