@@ -47,11 +47,11 @@ def benchmark():
     val_labels_arousal = tf.convert_to_tensor(val_labels_arousal, dtype=tf.float32)
 
 
-    mean_hapiness = tf.fill(tf.shape(val_happiness), tf.mean(train_happiness))
-    mean_calmness = tf.fill(tf.shape(val_calmness), tf.mean(train_calmness))
+    mean_hapiness = tf.fill(tf.shape(val_happiness), tf.reduce_mean(train_happiness))
+    mean_calmness = tf.fill(tf.shape(val_calmness), tf.reduce_mean(train_calmness))
     mean_sadness = tf.fill(tf.shape(val_sadness), tf.reduce_mean(train_sadness))
-    mean_fear = tf.fill(tf.shape(val_fear), tf.mean(train_fear))
-    mean_anger = tf.fill(tf.shape(val_anger), tf.mean(train_anger))
+    mean_fear = tf.fill(tf.shape(val_fear), tf.reduce_mean(train_fear))
+    mean_anger = tf.fill(tf.shape(val_anger), tf.reduce_mean(train_anger))
     mean_val = tf.fill(tf.shape(val_labels_valence), tf.reduce_mean(train_labels_valence))
     mean_ar = tf.fill(tf.shape(val_labels_arousal), tf.reduce_mean(train_labels_arousal))
 
