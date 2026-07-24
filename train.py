@@ -39,28 +39,22 @@ def train_model():
     val_labels_valence = (val_labels[:, 26:27] - 1.0) / 9.0
     val_labels_arousal = (val_labels[:, 27:28] - 1.0) / 9.0
     
-    train_confusion = train_labels[:, 1]
-    train_happiness = np.max(train_labels[:, [5, 7, 4]], axis=1, keepdims=True)
-    train_connfidence = np.max(train_labels[:, [8, 19, 3]], axis=1, keepdims=True)
+    train_happiness = train_labels[:, 5]
     train_calmness = train_labels[:, 9]
-    train_distress = np.max(train_labels[:, [11, 14, 12, 18, 24]], axis=1, keepdims=True)
-    train_fear = np.max(train_labels[:, [16, 25]], axis=1, keepdims=True)
-    train_anger = np.max(train_labels[:, [22, 20, 6, 23]], axis=1, keepdims=True)
+    train_sadness = train_labels[:, 12]
+    train_fear = train_labels[:, 16]
+    train_anger = train_labels[:, 22]
     
-    val_confusion = val_labels[:, 1]
-    val_happiness = np.max(val_labels[:, [5, 7, 4]], axis=1, keepdims=True)
-    val_connfidence = np.max(val_labels[:, [8, 19, 3]], axis=1, keepdims=True)
-    val_calmness = val_labels[:, 9]
-    val_distress = np.max(val_labels[:, [11, 14, 12, 18, 24]], axis=1, keepdims=True)
-    val_fear = np.max(val_labels[:, [16, 25]], axis=1, keepdims=True)
-    val_anger = np.max(val_labels[:, [22, 20, 6, 23]], axis=1, keepdims=True)
+    val_happiness = train_labels[:, 5]
+    val_calmness = train_labels[:, 9]
+    val_sadness = train_labels[:, 12]
+    val_fear = train_labels[:, 16]
+    val_anger = train_labels[:, 22]
     
     train_labels_tensors = {
-        "confusion": tf.convert_to_tensor(train_confusion, dtype=tf.float32),
         "happiness": tf.convert_to_tensor(train_happiness, dtype=tf.float32),
-        "confidence": tf.convert_to_tensor(train_connfidence, dtype=tf.float32),
         "calmness": tf.convert_to_tensor(train_calmness, dtype=tf.float32),
-        "distress": tf.convert_to_tensor(train_distress, dtype=tf.float32),
+        "sadness": tf.convert_to_tensor(train_sadness, dtype=tf.float32),
         "fear": tf.convert_to_tensor(train_fear, dtype=tf.float32),
         "anger": tf.convert_to_tensor(train_anger, dtype=tf.float32),
         "valence": tf.convert_to_tensor(train_labels_valence, dtype=tf.float32),
@@ -68,11 +62,9 @@ def train_model():
     }
     
     val_labels_tensors = {
-        "confusion": tf.convert_to_tensor(val_confusion, dtype=tf.float32),
         "happiness": tf.convert_to_tensor(val_happiness, dtype=tf.float32),
-        "confidence": tf.convert_to_tensor(val_connfidence, dtype=tf.float32),
         "calmness": tf.convert_to_tensor(val_calmness, dtype=tf.float32),
-        "distress": tf.convert_to_tensor(val_distress, dtype=tf.float32),
+        "sadness": tf.convert_to_tensor(val_sadness, dtype=tf.float32),
         "fear": tf.convert_to_tensor(val_fear, dtype=tf.float32),
         "anger": tf.convert_to_tensor(val_anger, dtype=tf.float32),
         "valence": tf.convert_to_tensor(val_labels_valence, dtype=tf.float32),
@@ -89,11 +81,9 @@ def train_model():
     optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4)
     
     losses = {
-        "confusion": tf.keras.losses.BinaryCrossentropy(from_logits=True),
         "happiness": tf.keras.losses.BinaryCrossentropy(from_logits=True),
-        "confidence": tf.keras.losses.BinaryCrossentropy(from_logits=True),
         "calmness": tf.keras.losses.BinaryCrossentropy(from_logits=True),
-        "distress": tf.keras.losses.BinaryCrossentropy(from_logits=True),
+        "sadness": tf.keras.losses.BinaryCrossentropy(from_logits=True),
         "fear": tf.keras.losses.BinaryCrossentropy(from_logits=True),
         "anger": tf.keras.losses.BinaryCrossentropy(from_logits=True),
         "valence": tf.keras.losses.MeanSquaredError(),
@@ -101,10 +91,8 @@ def train_model():
     }
     
     loss_weights = {
-        "confusion": 1.0,
         "happiness": 1.0,
-        "confidence": 1.0,
-        "calmness": 1.0,
+        "sadness": 1.0,
         "distress": 1.0,
         "fear": 1.0,
         "anger": 1.0,
@@ -121,7 +109,7 @@ def train_model():
      
     early_stopping = tf.keras.callbacks.EarlyStopping(
         monitor="val_loss",
-        patience=10,
+        patience=20,
         restore_best_weights=True
     )
     
