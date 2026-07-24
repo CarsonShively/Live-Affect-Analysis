@@ -15,14 +15,27 @@ def evaluate():
     
     test_len = test_labels.shape[0]
     
+    test_labels_valence = (test_labels[:, 26:27] - 1.0) / 9.0
+    test_labels_arousal = (test_labels[:, 27:28] - 1.0) / 9.0
+    
+    test_happiness = test_labels[:, 5:6]
+    test_calmness = test_labels[:, 9:10]
+    test_sadness = test_labels[:, 12:13]
+    test_fear = test_labels[:, 16:17]
+    test_anger = test_labels[:, 22:23]
+    
     test_images_tensor = tf.convert_to_tensor(test_images, dtype=tf.uint8)
     
     test_images_tensor = test_images_tensor[:test_len]
     
     test_labels_tensors = {
-        "category": tf.convert_to_tensor(test_labels[:, :26], dtype=tf.float32),
-        "valence": tf.convert_to_tensor((test_labels[:, 26:27]-1)/9, dtype=tf.float32),
-        "arousal": tf.convert_to_tensor((test_labels[:, 27:28]-1)/9, dtype=tf.float32)
+        "happiness": tf.convert_to_tensor(test_happiness, dtype=tf.float32),
+        "calmness": tf.convert_to_tensor(test_calmness, dtype=tf.float32),
+        "sadness": tf.convert_to_tensor(test_sadness, dtype=tf.float32),
+        "fear": tf.convert_to_tensor(test_fear, dtype=tf.float32),
+        "anger": tf.convert_to_tensor(test_anger, dtype=tf.float32),
+        "valence": tf.convert_to_tensor(test_labels_valence, dtype=tf.float32),
+        "arousal": tf.convert_to_tensor(test_labels_arousal, dtype=tf.float32)
     }
     
     model_weights_path = Path(snapshot_download(
@@ -40,14 +53,29 @@ def evaluate():
     model.load_weights(model_weights_path / "low_latency_model.weights.h5")
     
     losses = {
-        "category": tf.keras.losses.BinaryCrossentropy(from_logits=True),
+        "happiness": tf.keras.losses.BinaryCrossentropy(from_logits=True),
+        "calmness": tf.keras.losses.BinaryCrossentropy(from_logits=True),
+        "sadness": tf.keras.losses.BinaryCrossentropy(from_logits=True),
+        "fear": tf.keras.losses.BinaryCrossentropy(from_logits=True),
+        "anger": tf.keras.losses.BinaryCrossentropy(from_logits=True),
         "valence": tf.keras.losses.MeanSquaredError(),
         "arousal": tf.keras.losses.MeanSquaredError()
+    }
+    
+    loss_weights = {
+        "happiness": 1.0,
+        "calmness": 1.0,
+        "sadness": 1.0,
+        "fear": 1.0,
+        "anger": 1.0,
+        "valence": 10.0,
+        "arousal": 10.0
     }
     
     
     model.compile(
         loss=losses,
+        loss_weights=loss_weights,
         jit_compile=False
     )
     
